@@ -1,0 +1,377 @@
+{
+ "meta": {
+  "key": "synthetic",
+  "name": "Synthetic stores",
+  "description": "Three made-up daily series for tests.",
+  "unit": "units",
+  "freq": "D",
+  "season": 7,
+  "horizon": 14,
+  "context": 0,
+  "n": 3,
+  "points": 210,
+  "start": "2024-01-01",
+  "end": "2024-07-28",
+  "ids": [
+   "A",
+   "B",
+   "C"
+  ],
+  "id_label": "Store",
+  "attrs": [
+   "Region"
+  ],
+  "source": "tests",
+  "covariates": [],
+  "has_known": false,
+  "has_closed": false,
+  "primary": "mape",
+  "notes": [],
+  "agg": "sum"
+ },
+ "H": 14,
+ "L": 0,
+ "primary": "mape",
+ "windows": 6,
+ "holdout": [
+  {
+   "start": "2024-05-06",
+   "end": "2024-05-19"
+  },
+  {
+   "start": "2024-05-20",
+   "end": "2024-06-02"
+  },
+  {
+   "start": "2024-06-03",
+   "end": "2024-06-16"
+  },
+  {
+   "start": "2024-06-17",
+   "end": "2024-06-30"
+  },
+  {
+   "start": "2024-07-01",
+   "end": "2024-07-14"
+  },
+  {
+   "start": "2024-07-15",
+   "end": "2024-07-28"
+  }
+ ],
+ "future": {
+  "start": "2024-07-29",
+  "end": "2024-08-11"
+ },
+ "leaderboard": [
+  {
+   "name": "Seasonal mean (4 cycles)",
+   "kind": "baseline",
+   "key": "seasonal_mean",
+   "secs": null,
+   "n": 252,
+   "mape": 0.06053,
+   "smape": 0.060249,
+   "rmspe": 0.081893,
+   "wape": 0.046574,
+   "mae": 6.284347,
+   "rmse": 7.368014,
+   "bias": -0.033442,
+   "mase": 1.572843
+  },
+  {
+   "name": "Timestral-28M",
+   "kind": "timestral",
+   "key": "mistralai/Timestral-28M|cov|missing",
+   "secs": 1.5,
+   "n": 252,
+   "mape": 0.082615,
+   "smape": 0.081603,
+   "rmspe": 0.133767,
+   "wape": 0.047809,
+   "mae": 6.450903,
+   "rmse": 8.010721,
+   "bias": -0.018267,
+   "mase": 1.462154,
+   "coverage": 0.769841,
+   "width": 0.235616,
+   "wql": 0.040928
+  },
+  {
+   "name": "Naive weekly (last week)",
+   "kind": "baseline",
+   "key": "seasonal_naive",
+   "secs": null,
+   "n": 252,
+   "mape": 0.082615,
+   "smape": 0.081603,
+   "rmspe": 0.133767,
+   "wape": 0.047809,
+   "mae": 6.450903,
+   "rmse": 8.010721,
+   "bias": -0.018267,
+   "mase": 1.462154
+  }
+ ],
+ "by_step": {
+  "Timestral-28M": [
+   0.052202,
+   0.044672,
+   0.046877,
+   0.047166,
+   0.048707,
+   0.044075,
+   0.115916,
+   0.10505,
+   0.096302,
+   0.1054,
+   0.10088,
+   0.094026,
+   0.074203,
+   0.181136
+  ],
+  "Seasonal mean (4 cycles)": [
+   0.068229,
+   0.053418,
+   0.052027,
+   0.047201,
+   0.042722,
+   0.039419,
+   0.072309,
+   0.063259,
+   0.056946,
+   0.062757,
+   0.063867,
+   0.063504,
+   0.057289,
+   0.104475
+  ],
+  "Naive weekly (last week)": [
+   0.052202,
+   0.044672,
+   0.046877,
+   0.047166,
+   0.048707,
+   0.044075,
+   0.115916,
+   0.10505,
+   0.096302,
+   0.1054,
+   0.10088,
+   0.094026,
+   0.074203,
+   0.181136
+  ]
+ },
+ "calendar": {
+  "name": "weekday",
+  "labels": [
+   "Mon",
+   "Tue",
+   "Wed",
+   "Thu",
+   "Fri",
+   "Sat",
+   "Sun"
+  ],
+  "values": {
+   "Timestral-28M": [
+    0.078626,
+    0.070487,
+    0.076138,
+    0.074023,
+    0.071366,
+    0.059139,
+    0.148526
+   ],
+   "Seasonal mean (4 cycles)": [
+    0.065744,
+    0.055182,
+    0.057392,
+    0.055534,
+    0.053113,
+    0.048354,
+    0.088392
+   ]
+  }
+ },
+ "calibration": {
+  "Timestral-28M": [
+   {
+    "nominal": 0.2,
+    "observed": 0.384921
+   },
+   {
+    "nominal": 0.4,
+    "observed": 0.611111
+   },
+   {
+    "nominal": 0.5,
+    "observed": 0.68254
+   },
+   {
+    "nominal": 0.6,
+    "observed": 0.718254
+   },
+   {
+    "nominal": 0.8,
+    "observed": 0.769841
+   },
+   {
+    "nominal": 0.9,
+    "observed": 0.789683
+   },
+   {
+    "nominal": 0.98,
+    "observed": 0.801587
+   }
+  ]
+ },
+ "best": "Timestral-28M",
+ "best_baseline": "Seasonal mean (4 cycles)",
+ "scored_points": 252,
+ "kpi": {
+  "model": {
+   "name": "Timestral-28M",
+   "kind": "timestral",
+   "key": "mistralai/Timestral-28M|cov|missing",
+   "secs": 1.5,
+   "n": 252,
+   "mape": 0.082615,
+   "smape": 0.081603,
+   "rmspe": 0.133767,
+   "wape": 0.047809,
+   "mae": 6.450903,
+   "rmse": 8.010721,
+   "bias": -0.018267,
+   "mase": 1.462154,
+   "coverage": 0.769841,
+   "width": 0.235616,
+   "wql": 0.040928
+  },
+  "baseline": {
+   "name": "Seasonal mean (4 cycles)",
+   "kind": "baseline",
+   "key": "seasonal_mean",
+   "secs": null,
+   "n": 252,
+   "mape": 0.06053,
+   "smape": 0.060249,
+   "rmspe": 0.081893,
+   "wape": 0.046574,
+   "mae": 6.284347,
+   "rmse": 7.368014,
+   "bias": -0.033442,
+   "mase": 1.572843
+  },
+  "gain": -0.36486,
+  "secs_total": 2.0
+ },
+ "per_window": {
+  "labels": [
+   "2024-05-06",
+   "2024-05-20",
+   "2024-06-03",
+   "2024-06-17",
+   "2024-07-01",
+   "2024-07-15"
+  ],
+  "values": {
+   "Timestral-28M": [
+    0.091251,
+    0.099272,
+    0.095453,
+    0.083763,
+    0.0702,
+    0.055751
+   ],
+   "Seasonal mean (4 cycles)": [
+    0.064951,
+    0.062749,
+    0.058503,
+    0.060173,
+    0.055621,
+    0.061185
+   ],
+   "Naive weekly (last week)": [
+    0.091251,
+    0.099272,
+    0.095453,
+    0.083763,
+    0.0702,
+    0.055751
+   ]
+  }
+ },
+ "distribution": {
+  "Timestral-28M": [
+   0.0292,
+   0.0324,
+   0.1863
+  ],
+  "Seasonal mean (4 cycles)": [
+   0.0338,
+   0.0429,
+   0.1049
+  ]
+ },
+ "best_series": [
+  {
+   "index": 0,
+   "id": "A",
+   "model": 0.029171,
+   "baseline": 0.033831
+  },
+  {
+   "index": 1,
+   "id": "B",
+   "model": 0.032359,
+   "baseline": 0.042872
+  },
+  {
+   "index": 2,
+   "id": "C",
+   "model": 0.186315,
+   "baseline": 0.104888
+  }
+ ],
+ "worst_series": [
+  {
+   "index": 2,
+   "id": "C",
+   "model": 0.186315,
+   "baseline": 0.104888
+  },
+  {
+   "index": 1,
+   "id": "B",
+   "model": 0.032359,
+   "baseline": 0.042872
+  },
+  {
+   "index": 0,
+   "id": "A",
+   "model": 0.029171,
+   "baseline": 0.033831
+  }
+ ],
+ "breakdown": {
+  "Region": {
+   "labels": [
+    "north (2)",
+    "south (1)"
+   ],
+   "values": {
+    "Timestral-28M": [
+     0.067249,
+     0.030371
+    ],
+    "Seasonal mean (4 cycles)": [
+     0.050635,
+     0.042932
+    ]
+   }
+  }
+ },
+ "total_kpi": 0.050164
+}

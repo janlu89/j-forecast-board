@@ -69,6 +69,7 @@ exclude = ["webapp/**", "tools/**", "timestral_demo.py"]
 # ----------------------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
 markers = [
   "model: needs the Timestral-28M weights in the local Hugging Face cache (never on CI)",

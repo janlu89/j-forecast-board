@@ -20,7 +20,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-CONFIG = Path(__file__).resolve().parent.parent / "agents_config.json"
+CONFIG = Path(os.environ.get("JFB_HOME") or Path(__file__).resolve().parent.parent) / "agents_config.json"
 # Some APIs sit behind Cloudflare, which rejects the default "Python-urllib" User-Agent (Groq: HTTP 403, error 1010).
 USER_AGENT = "timestral-demo/1.0"
 _lock = threading.Lock()

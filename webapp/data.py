@@ -7,6 +7,7 @@ Public datasets are downloaded once and cached in ../data.
 from __future__ import annotations
 
 import io
+import os
 import threading
 import time
 import urllib.request
@@ -19,8 +20,10 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = ROOT / "data"
-DATA_DIR.mkdir(exist_ok=True)
+# Folder for runtime files (datasets, results, credentials, agent settings). JFB_HOME moves it, e.g. for tests.
+HOME = Path(os.environ.get("JFB_HOME") or ROOT)
+DATA_DIR = HOME / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass

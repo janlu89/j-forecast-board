@@ -1,0 +1,48 @@
+{
+ "H": 14,
+ "L": 0,
+ "variants": [
+  {
+   "key": "mistralai/Timestral-5M|cov|missing",
+   "label": "Timestral-5M",
+   "done": false,
+   "model": "Timestral-5M",
+   "state": "idle",
+   "progress": null,
+   "eta": null,
+   "error": null
+  },
+  {
+   "key": "mistralai/Timestral-28M|cov|missing",
+   "label": "Timestral-28M",
+   "done": true,
+   "model": "Timestral-28M",
+   "state": "done",
+   "progress": null,
+   "eta": null,
+   "error": null
+  },
+  {
+   "key": "mistralai/Timestral-123M|cov|missing",
+   "label": "Timestral-123M",
+   "done": false,
+   "model": "Timestral-123M",
+   "state": "idle",
+   "progress": null,
+   "eta": null,
+   "error": null
+  },
+  {
+   "key": "mistralai/Timestral-209M|cov|missing",
+   "label": "Timestral-209M",
+   "done": false,
+   "model": "Timestral-209M",
+   "state": "idle",
+   "progress": null,
+   "eta": null,
+   "error": null
+  }
+ ],
+ "jobs": [],
+ "any_running": false
+}

@@ -1,0 +1,108 @@
+[
+ {
+  "key": "passengers",
+  "name": "Airline passengers · monthly",
+  "description": "Classic Box-Jenkins series: international airline passengers per month (thousands), 1949-1960. Strong trend and growing seasonality, no covariates.",
+  "unit": "thousand passengers",
+  "freq": "MS",
+  "season": 12,
+  "horizon": 12,
+  "context": 0,
+  "n": 1,
+  "points": 144,
+  "start": "1949-01-01",
+  "end": "1960-12-01",
+  "ids": [
+   "World"
+  ],
+  "id_label": "Series",
+  "attrs": [],
+  "source": "Box & Jenkins (1976)",
+  "covariates": [],
+  "has_known": false,
+  "has_closed": false,
+  "primary": "mape",
+  "notes": [],
+  "agg": "sum"
+ },
+ {
+  "key": "bike",
+  "name": "Bike sharing · daily rentals",
+  "description": "Capital Bikeshare (Washington DC), total rentals per day, 2011-2012. Holidays, working days and weather are covariates known in advance (weather = forecast).",
+  "unit": "rentals / day",
+  "freq": "D",
+  "season": 7,
+  "horizon": 42,
+  "context": 0,
+  "n": 1,
+  "points": 731,
+  "start": "2011-01-01",
+  "end": "2012-12-31",
+  "ids": [
+   "DC"
+  ],
+  "id_label": "City",
+  "attrs": [],
+  "source": "UCI ML Repository #275",
+  "covariates": [
+   {
+    "name": "Holiday",
+    "kind": "known",
+    "cat": true
+   },
+   {
+    "name": "Working day",
+    "kind": "known",
+    "cat": true
+   },
+   {
+    "name": "Weather (1 clear … 4 storm)",
+    "kind": "known",
+    "cat": true
+   },
+   {
+    "name": "Temperature °C",
+    "kind": "known",
+    "cat": false
+   }
+  ],
+  "has_known": true,
+  "has_closed": false,
+  "primary": "wape",
+  "notes": [
+   "Future weather is unknown: the forecast assumes the same weather as one year earlier (shown faded).",
+   "A few near-empty days (e.g. Hurricane Sandy, 22 rentals) make MAPE explode, so WAPE is the headline metric."
+  ],
+  "agg": "sum"
+ },
+ {
+  "key": "synthetic",
+  "name": "Synthetic stores",
+  "description": "Three made-up daily series for tests.",
+  "unit": "units",
+  "freq": "D",
+  "season": 7,
+  "horizon": 14,
+  "context": 0,
+  "n": 3,
+  "points": 210,
+  "start": "2024-01-01",
+  "end": "2024-07-28",
+  "ids": [
+   "A",
+   "B",
+   "C"
+  ],
+  "id_label": "Store",
+  "attrs": [
+   "Region"
+  ],
+  "source": "tests",
+  "covariates": [],
+  "has_known": false,
+  "has_closed": false,
+  "primary": "mape",
+  "notes": [],
+  "agg": "sum"
+ }
+]

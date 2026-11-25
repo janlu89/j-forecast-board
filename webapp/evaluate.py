@@ -13,10 +13,10 @@ import numpy as np
 import pandas as pd
 
 from . import engine as E
-from .data import ROOT, Dataset, known_extended
+from .data import HOME, Dataset, known_extended
 
-RESULTS_DIR = ROOT / "results"
-RESULTS_DIR.mkdir(exist_ok=True)
+RESULTS_DIR = HOME / "results"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 MEMO: dict[tuple, dict] = {}  # (ds_key, H, L, variant) -> result
 JOBS: dict[tuple, dict] = {}

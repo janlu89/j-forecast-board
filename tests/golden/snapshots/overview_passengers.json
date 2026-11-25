@@ -1,0 +1,311 @@
+{
+ "meta": {
+  "key": "passengers",
+  "name": "Airline passengers · monthly",
+  "description": "Classic Box-Jenkins series: international airline passengers per month (thousands), 1949-1960. Strong trend and growing seasonality, no covariates.",
+  "unit": "thousand passengers",
+  "freq": "MS",
+  "season": 12,
+  "horizon": 12,
+  "context": 0,
+  "n": 1,
+  "points": 144,
+  "start": "1949-01-01",
+  "end": "1960-12-01",
+  "ids": [
+   "World"
+  ],
+  "id_label": "Series",
+  "attrs": [],
+  "source": "Box & Jenkins (1976)",
+  "covariates": [],
+  "has_known": false,
+  "has_closed": false,
+  "primary": "mape",
+  "notes": [],
+  "agg": "sum"
+ },
+ "H": 12,
+ "L": 0,
+ "primary": "mape",
+ "windows": 6,
+ "holdout": [
+  {
+   "start": "1955-01-01",
+   "end": "1955-12-01"
+  },
+  {
+   "start": "1956-01-01",
+   "end": "1956-12-01"
+  },
+  {
+   "start": "1957-01-01",
+   "end": "1957-12-01"
+  },
+  {
+   "start": "1958-01-01",
+   "end": "1958-12-01"
+  },
+  {
+   "start": "1959-01-01",
+   "end": "1959-12-01"
+  },
+  {
+   "start": "1960-01-01",
+   "end": "1960-12-01"
+  }
+ ],
+ "future": {
+  "start": "1961-01-01",
+  "end": "1961-12-01"
+ },
+ "leaderboard": [
+  {
+   "name": "Timestral-28M",
+   "kind": "timestral",
+   "key": "mistralai/Timestral-28M|cov|missing",
+   "secs": 0.035975,
+   "n": 72,
+   "mape": 0.044959,
+   "smape": 0.045831,
+   "rmspe": 0.054913,
+   "wape": 0.044506,
+   "mae": 16.809738,
+   "rmse": 20.593279,
+   "bias": -0.023865,
+   "mase": 0.730329,
+   "coverage": 0.736111,
+   "width": 0.131707,
+   "wql": 0.029763
+  },
+  {
+   "name": "Naive yearly (last year)",
+   "kind": "baseline",
+   "key": "seasonal_naive",
+   "secs": null,
+   "n": 72,
+   "mape": 0.107113,
+   "smape": 0.114419,
+   "rmspe": 0.11668,
+   "wape": 0.104692,
+   "mae": 39.541667,
+   "rmse": 43.122403,
+   "bias": -0.104692,
+   "mase": 1.717958
+  },
+  {
+   "name": "Seasonal mean (4 cycles)",
+   "kind": "baseline",
+   "key": "seasonal_mean",
+   "secs": null,
+   "n": 72,
+   "mape": 0.237147,
+   "smape": 0.270243,
+   "rmspe": 0.240583,
+   "wape": 0.234454,
+   "mae": 88.552083,
+   "rmse": 91.104979,
+   "bias": -0.234454,
+   "mase": 3.847303
+  }
+ ],
+ "by_step": {
+  "Timestral-28M": [
+   0.019858,
+   0.026254,
+   0.042879,
+   0.049072,
+   0.043431,
+   0.048335,
+   0.057064,
+   0.049163,
+   0.057043,
+   0.045886,
+   0.045395,
+   0.055129
+  ],
+  "Seasonal mean (4 cycles)": [
+   0.240407,
+   0.228306,
+   0.21059,
+   0.228761,
+   0.237192,
+   0.245789,
+   0.257525,
+   0.256604,
+   0.238689,
+   0.239625,
+   0.234114,
+   0.228158
+  ],
+  "Naive yearly (last year)": [
+   0.111517,
+   0.113444,
+   0.090517,
+   0.109916,
+   0.109404,
+   0.109906,
+   0.11279,
+   0.1135,
+   0.104716,
+   0.109244,
+   0.101994,
+   0.098403
+  ]
+ },
+ "calendar": {
+  "name": "month",
+  "labels": [
+   "Jan",
+   "Feb",
+   "Mar",
+   "Apr",
+   "May",
+   "Jun",
+   "Jul",
+   "Aug",
+   "Sep",
+   "Oct",
+   "Nov",
+   "Dec"
+  ],
+  "values": {
+   "Timestral-28M": [
+    0.019858,
+    0.026254,
+    0.042879,
+    0.049072,
+    0.043431,
+    0.048335,
+    0.057064,
+    0.049163,
+    0.057043,
+    0.045886,
+    0.045395,
+    0.055129
+   ],
+   "Naive yearly (last year)": [
+    0.111517,
+    0.113444,
+    0.090517,
+    0.109916,
+    0.109404,
+    0.109906,
+    0.11279,
+    0.1135,
+    0.104716,
+    0.109244,
+    0.101994,
+    0.098403
+   ]
+  }
+ },
+ "calibration": {
+  "Timestral-28M": [
+   {
+    "nominal": 0.2,
+    "observed": 0.194444
+   },
+   {
+    "nominal": 0.4,
+    "observed": 0.361111
+   },
+   {
+    "nominal": 0.5,
+    "observed": 0.444444
+   },
+   {
+    "nominal": 0.6,
+    "observed": 0.5
+   },
+   {
+    "nominal": 0.8,
+    "observed": 0.736111
+   },
+   {
+    "nominal": 0.9,
+    "observed": 0.944444
+   },
+   {
+    "nominal": 0.98,
+    "observed": 1.0
+   }
+  ]
+ },
+ "best": "Timestral-28M",
+ "best_baseline": "Naive yearly (last year)",
+ "scored_points": 72,
+ "kpi": {
+  "model": {
+   "name": "Timestral-28M",
+   "kind": "timestral",
+   "key": "mistralai/Timestral-28M|cov|missing",
+   "secs": 0.035975,
+   "n": 72,
+   "mape": 0.044959,
+   "smape": 0.045831,
+   "rmspe": 0.054913,
+   "wape": 0.044506,
+   "mae": 16.809738,
+   "rmse": 20.593279,
+   "bias": -0.023865,
+   "mase": 0.730329,
+   "coverage": 0.736111,
+   "width": 0.131707,
+   "wql": 0.029763
+  },
+  "baseline": {
+   "name": "Naive yearly (last year)",
+   "kind": "baseline",
+   "key": "seasonal_naive",
+   "secs": null,
+   "n": 72,
+   "mape": 0.107113,
+   "smape": 0.114419,
+   "rmspe": 0.11668,
+   "wape": 0.104692,
+   "mae": 39.541667,
+   "rmse": 43.122403,
+   "bias": -0.104692,
+   "mase": 1.717958
+  },
+  "gain": 0.580266,
+  "secs_total": 0.04197
+ },
+ "per_window": {
+  "labels": [
+   "1955-01-01",
+   "1956-01-01",
+   "1957-01-01",
+   "1958-01-01",
+   "1959-01-01",
+   "1960-01-01"
+  ],
+  "values": {
+   "Timestral-28M": [
+    0.067805,
+    0.029011,
+    0.031408,
+    0.055796,
+    0.066237,
+    0.019499
+   ],
+   "Seasonal mean (4 cycles)": [
+    0.265731,
+    0.279115,
+    0.26805,
+    0.197361,
+    0.204194,
+    0.208429
+   ],
+   "Naive yearly (last year)": [
+    0.158429,
+    0.134854,
+    0.107586,
+    0.031351,
+    0.110579,
+    0.099875
+   ]
+  }
+ }
+}
