@@ -34,7 +34,7 @@ agents_config.tmp
 *.key
 bundle*.zip
 
-# Internal working plan (mentions the owner's machines and employer): kept on disk, never published
+# Internal working notes: kept on disk, not published
 docs/ROADMAP.md
 
 # Editors and OS
