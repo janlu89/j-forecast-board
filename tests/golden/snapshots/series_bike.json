@@ -47,7 +47,8 @@
    "Future weather is unknown: the forecast assumes the same weather as one year earlier (shown faded).",
    "A few near-empty days (e.g. Hurricane Sandy, 22 rentals) make MAPE explode, so WAPE is the headline metric."
   ],
-  "agg": "sum"
+  "agg": "sum",
+  "visibility": "public"
  },
  "index": 0,
  "id": "DC",

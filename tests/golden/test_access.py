@@ -18,9 +18,9 @@ def test_api_without_credentials_is_refused(client):
 
 
 def test_browser_without_session_is_sent_to_the_login_page(client):
-    response = anonymous(client).get("static/app.js", headers={"accept": "text/html"})
+    response = anonymous(client).get("static/js/main.js", headers={"accept": "text/html"})
     assert response.status_code == 303
-    assert response.headers["location"] == "../login?next=static/app.js"
+    assert response.headers["location"] == "../../login?next=static/js/main.js"
 
 
 def test_login_page_is_public(client):
@@ -31,10 +31,10 @@ def test_login_page_is_public(client):
 
 def test_wrong_password_returns_to_the_login_page(client, credentials):
     user, _ = credentials
-    form = {"username": user, "password": "wrong", "next": "static/app.js"}
+    form = {"username": user, "password": "wrong", "next": "static/js/main.js"}
     response = anonymous(client).post("login", data=form)
     assert response.status_code == 303
-    assert response.headers["location"] == "login?e=1&next=static/app.js"
+    assert response.headers["location"] == "login?e=1&next=static/js/main.js"
 
 
 def test_login_sets_a_session_cookie_that_opens_the_api(client, credentials):
@@ -55,6 +55,6 @@ def test_login_can_be_switched_off(client, container, monkeypatch):
 def test_index_versions_its_own_assets(client):
     response = client.get("")
     assert response.status_code == 200
-    assert '"static/app.js?v=' in response.text
+    assert '"static/js/main.js"' in response.text
     assert '"static/style.css?v=' in response.text
     assert response.headers["cache-control"] == "no-store"

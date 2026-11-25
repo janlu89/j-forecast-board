@@ -72,6 +72,7 @@ class Container:
     ask: AskAssistant
     tool_gateway: ToolGateway
     assistant_agents: dict
+    version: str
 
     def start(self) -> None:
         """Load the built-in datasets, start the worker, queue the background evaluations."""
@@ -145,5 +146,6 @@ def build(settings: Settings, loaders: dict[str, Loader] | None = None) -> Conta
         ask=ask,
         tool_gateway=gateway,
         assistant_agents=agents,
+        version=app_version(),
         **views,
     )

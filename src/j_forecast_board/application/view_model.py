@@ -147,4 +147,5 @@ def dataset_meta(ds: Dataset) -> dict:
         primary=ds.primary,
         notes=ds.notes,
         agg=ds.agg,
+        visibility=ds.visibility,
     )

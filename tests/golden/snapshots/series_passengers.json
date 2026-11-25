@@ -23,7 +23,8 @@
   "has_closed": false,
   "primary": "mape",
   "notes": [],
-  "agg": "sum"
+  "agg": "sum",
+  "visibility": "public"
  },
  "index": 0,
  "id": "World",

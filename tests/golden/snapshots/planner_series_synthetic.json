@@ -27,7 +27,8 @@
   "has_closed": false,
   "primary": "mape",
   "notes": [],
-  "agg": "sum"
+  "agg": "sum",
+  "visibility": "public"
  },
  "model": "Timestral-28M",
  "baseline": "Seasonal mean (4 cycles)",

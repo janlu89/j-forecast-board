@@ -27,7 +27,8 @@
   "has_closed": false,
   "primary": "mape",
   "notes": [],
-  "agg": "sum"
+  "agg": "sum",
+  "visibility": "public"
  },
  "index": 1,
  "id": "B",

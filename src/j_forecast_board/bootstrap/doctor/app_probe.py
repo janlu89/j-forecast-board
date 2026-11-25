@@ -124,7 +124,7 @@ def _route_checks(app: LocalApp, paths: RuntimePaths, progress) -> list[Check]:
         run_check("app", "POST /login", lambda: _wrong_password(app)),
         run_check("app", "session", lambda: _session(app)),
         _route(app, "GET /", "GET", "/", expect=200, html=True),
-        _route(app, "GET /static/app.js", "GET", "/static/app.js", expect=200),
+        _route(app, "GET /static/js/main.js", "GET", "/static/js/main.js", expect=200),
         _route(app, "GET /static/vendor/plotly.min.js", "GET", "/static/vendor/plotly.min.js", 200),
         _route(app, "GET /manual", "GET", "/manual", expect=307),
         _route(app, "GET /static/manual/index.html", "GET", "/static/manual/index.html", 200),

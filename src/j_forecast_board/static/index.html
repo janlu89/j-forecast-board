@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Timestral demo</title>
+<title>J-Forecast Board</title>
 <!-- Served under a path prefix (e.g. /timestral via Tailscale Funnel): relative URLs need a trailing slash. -->
 <script>if (!location.pathname.endsWith("/")) location.replace(location.pathname + "/" + location.search + location.hash);</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230b0d12'/%3E%3Cpath d='M2 11 L6 7 L9 9 L14 3' stroke='%23ff7a1a' stroke-width='2' fill='none'/%3E%3C/svg%3E">
@@ -205,6 +205,7 @@
     <label class="drop" id="drop"><input type="file" id="upFile" accept=".csv,.txt" hidden>
       <b>Click or drop a CSV file here</b><br><span class="note">one date column + at least one numeric column</span></label>
     <div id="upForm"></div>
+    <div id="upList"></div>
   </div>
 </section>
 
@@ -212,36 +213,53 @@
 <section class="tab" id="tab-about"><div class="card prose" id="aboutBody"></div></section>
 </main>
 <!-- ======================================================= CHAT (side panel, available on every tab) -->
-<button id="chatFab" class="chatfab" type="button" aria-controls="chatDrawer" aria-expanded="false">💬 Ask about this page</button>
+<button id="chatFab" class="chatfab" type="button" aria-controls="chatDrawer" aria-expanded="false">💬 Set up the AI assistant</button>
 <aside id="chatDrawer" class="drawer" hidden aria-label="Ask about this page">
   <div class="drawer-hd">
-    <div><div class="drawer-title">💬 Ask about this page</div><div class="note" id="chatCtx"></div></div>
+    <div><div class="drawer-title">💬 Ask about this page <span id="egressBadge" class="egress" hidden></span></div>
+      <div class="note" id="chatCtx"></div></div>
     <div class="drawer-actions">
-      <button type="button" id="agentBtn" class="agentbtn" title="Choose and configure the AI agent" aria-haspopup="dialog">
-        <span class="dot" id="agentDot"></span><span id="agentName">Claude</span> <span aria-hidden="true">⚙</span></button>
+      <button type="button" id="agentBtn" class="agentbtn" title="Choose and set up the AI assistant" aria-haspopup="dialog">
+        <span class="dot" id="agentDot"></span><span id="agentName">Set up</span> <span aria-hidden="true">⚙</span></button>
       <button type="button" id="chatClose" class="iconbtn" title="Close" aria-label="Close">✕</button>
     </div>
   </div>
   <div id="chatLog" class="chatlog" aria-live="polite"></div>
   <div class="chatsuggest" id="chatSuggest"></div>
   <form id="chatForm" class="chatform">
-    <textarea id="chatIn" rows="2" placeholder="Ask about what you see, e.g. “Explain these numbers”" maxlength="2000" aria-label="Your question"></textarea>
-    <button class="primary" id="chatSend" type="submit">Send</button>
+    <textarea id="chatIn" rows="2" placeholder="Set up the AI assistant first (⚙)" maxlength="2000" aria-label="Your question" disabled></textarea>
+    <button class="primary" id="chatSend" type="submit" disabled>Send</button>
   </form>
-  <div class="note">The agent sees this page (numbers, tables, chart data) and can run the demo’s forecasting tools. English answers, one question at a time.</div>
+  <div class="note">The assistant sees this page (as set in ⚙) and can run the app’s forecasting tools. English answers, one question at a time.</div>
 </aside>
 <dialog id="agentModal" class="modal" aria-labelledby="agentTitle">
   <form method="dialog" id="agentForm">
-    <div class="modal-hd"><h3 id="agentTitle">AI agent for the chat</h3>
+    <div class="modal-hd"><h3 id="agentTitle">AI assistant</h3>
       <button type="button" class="iconbtn" id="agentX" aria-label="Close">✕</button></div>
-    <p class="note">Choose who answers in “Ask about this page”. Every agent gets the same page context and the same forecasting tools.
-      API keys are stored only on the demo PC and are never sent back to the browser.</p>
-    <div id="agentList" class="agentlist" role="radiogroup" aria-label="Agent"></div>
+    <p class="note">The assistant is optional: the rest of the app works without it. A <b>Local</b> assistant keeps everything on this PC.
+      An <b>External</b> one sends your questions and the page you look at to an online service. API keys stay on this PC and are never sent back to the browser.</p>
+    <div id="agentList" class="agentlist" role="radiogroup" aria-label="Assistant"></div>
+    <fieldset class="ctxlevel"><legend>What the assistant may see of the page</legend><div id="agentContext"></div></fieldset>
+    <div id="consentBox" class="consent" hidden role="alertdialog" aria-labelledby="consentTitle">
+      <h4 id="consentTitle">Your data will leave this PC</h4>
+      <p><b id="consentDest"></b> will receive, with each question: the question itself, the visible text and numbers of the current tab,
+        compact chart data (unless you chose less above), and the results of the forecasting tools the assistant calls.</p>
+      <ul>
+        <li>That service's terms and data retention apply, not this app's.</li>
+        <li>Your company's policy may not allow it: check before you use company data.</li>
+        <li>Nothing is sent until you ask a question. Your own uploaded datasets are never sent.</li>
+        <li>To stop, choose <b>Local model</b> here or press <b>Switch off</b>.</li>
+      </ul>
+      <label class="chk"><input type="checkbox" id="consentOk"> I understand and want to use this service.</label>
+      <label class="chk" id="consentPrivate" hidden><input type="checkbox" id="consentPrivateOk"> Also send my uploaded (private) datasets: the administrator's policy allows it.</label>
+      <div class="modal-ft"><button type="button" id="consentBack">Back</button><button type="button" class="primary" id="consentGo" disabled>Confirm and use it</button></div>
+    </div>
     <div class="modal-ft"><span class="note" id="agentMsg" role="status"></span>
-      <button type="button" id="agentCancel">Cancel</button><button type="submit" class="primary" id="agentSave">Use this agent</button></div>
+      <button type="button" id="agentOff" hidden>Switch off</button>
+      <button type="button" id="agentCancel">Close</button><button type="submit" class="primary" id="agentSave">Use this assistant</button></div>
   </form>
 </dialog>
 <div id="toast"></div>
-<script src="static/app.js"></script>
+<script type="module" src="static/js/main.js"></script>
 </body>
 </html>

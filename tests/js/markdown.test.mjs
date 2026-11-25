@@ -1,31 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-// The chat's tiny Markdown renderer (md in src/j_forecast_board/static/app.js). Run: node --test "tests/js/*.test.mjs"
+// The chat's tiny Markdown renderer (web module chat/markdown.js). Run: node --test "tests/js/*.test.mjs"
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import vm from "node:vm";
 
-const APP = new URL("../../src/j_forecast_board/static/app.js", import.meta.url);
-
-/** Load `esc` and `md` from the legacy script, which is not a module yet. */
-function loadRenderer() {
-  const source = readFileSync(APP, "utf8");
-  const esc = source.match(/^const esc = .*$/m)[0].replace(/^const /, "var ");
-  const start = source.indexOf("function md(src) {");
-  assert.ok(start >= 0, "md() not found in app.js");
-  let depth = 0;
-  let end = start;
-  for (; end < source.length; end++) {
-    if (source[end] === "{") depth++;
-    if (source[end] === "}" && --depth === 0) break;
-  }
-  const context = vm.createContext({});
-  vm.runInContext(`${esc}\n${source.slice(start, end + 1)}`, context);
-  return context.md;
-}
-
-const md = loadRenderer();
-
+import { md } from "../../src/j_forecast_board/static/js/chat/markdown.js";
 test("paragraph lines are joined with line breaks", () => {
   assert.equal(md("one\ntwo\n\nthree"), "<p>one<br>two</p><p>three</p>");
 });

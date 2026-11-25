@@ -86,6 +86,7 @@ def _catalog_routes(app: FastAPI, services) -> None:
             cpu=platform.processor(),
             cores=os.cpu_count(),
             python=platform.python_version(),
+            version=services.version,
             model_backend=services.settings.model,
             offline=services.settings.offline,
         )
@@ -170,6 +171,11 @@ def _upload_routes(app: FastAPI, services) -> None:
     @app.post("/api/upload")
     async def upload(file: UploadFile = File(...)):  # noqa: B008 - FastAPI's declaration style
         return plain(services.uploads.preview(await file.read(), file.filename))
+
+    @app.post("/api/datasets/{key}/delete")
+    def delete_dataset(key: str):
+        services.uploads.forget(key)
+        return dict(deleted=key)
 
     @app.post("/api/upload/register")
     def register(r: dtos.RegisterBody):

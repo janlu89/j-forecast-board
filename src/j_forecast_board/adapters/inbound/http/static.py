@@ -10,7 +10,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 WEB = Path(__file__).resolve().parents[3] / "static"
-VERSIONED = ("style.css", "app.js")
+VERSIONED = ("style.css",)
+REVALIDATE = (".js", ".css", ".html")  # the app's own code: always check for a newer copy
 
 
 def install(app: FastAPI) -> None:
@@ -26,7 +27,21 @@ def install(app: FastAPI) -> None:
     def index():
         return HTMLResponse(_index_page(), headers={"Cache-Control": "no-store"})
 
-    app.mount("/static", StaticFiles(directory=WEB), name="static")
+    app.mount("/static", RevalidatingFiles(directory=WEB), name="static")
+
+
+class RevalidatingFiles(StaticFiles):
+    """ES modules cannot carry a version in their import URLs: the browser revalidates them
+    (cheap 304 answers), while the vendored Plotly may be cached for a day."""
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        path = str(args[0]) if args else ""
+        if "/vendor/" in path.replace("\\", "/"):
+            response.headers["Cache-Control"] = "public, max-age=86400"
+        elif path.endswith(REVALIDATE):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
 
 
 def _index_page() -> str:
