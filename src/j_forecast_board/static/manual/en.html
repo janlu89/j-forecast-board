@@ -461,25 +461,11 @@
     <tr><td>My data has disappeared</td><td>After the program restarts, uploaded files must be uploaded again (by design: they are not saved to disk).</td></tr>
   </table>
   <div class="tip"><b>💡</b> Licence: the model is free for testing and for companies under 20 million dollars of revenue per month; above that threshold a commercial licence from Mistral is required.</div>
-  <p class="noprint" style="margin-top:18px"><a href="/">← Back to the application</a> · <a href="#" onclick="window.print();return false;">🖨️ Print / save as PDF</a> · <a href="index.html">🇮🇹 Versione italiana</a></p>
+  <p class="noprint" style="margin-top:18px"><a href="/">← Back to the application</a> · <a href="#" data-print>🖨️ Print / save as PDF</a> · <a href="index.html">🇮🇹 Versione italiana</a></p>
 </section>
 </div>
 <a class="top noprint" href="#">↑ Contents</a>
 
-<script>
-// place the numbers on the screenshots (coordinates computed by tools/make_manual_shots.py)
-fetch("shots.json").then((r) => r.json()).then((shots) => {
-  document.querySelectorAll("figure.shot").forEach((fig) => {
-    const s = shots[fig.dataset.shot];
-    if (!s) return;
-    s.markers.forEach((m) => {
-      const el = document.createElement("span");
-      el.className = "mk"; el.textContent = m.n;
-      el.style.left = m.x + "%"; el.style.top = m.y + "%";
-      fig.appendChild(el);
-    });
-  });
-});
-</script>
+<script src="markers.js"></script>
 </body>
 </html>

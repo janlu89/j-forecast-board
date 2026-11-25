@@ -473,25 +473,11 @@
     <tr><td>I miei dati sono spariti</td><td>Dopo un riavvio del programma i file caricati vanno ricaricati (per scelta: non vengono salvati su disco).</td></tr>
   </table>
   <div class="tip"><b>💡</b> Licenza: il modello è gratuito per prove e per aziende sotto i 20 milioni di dollari di fatturato al mese; sopra quella soglia serve una licenza commerciale di Mistral.</div>
-  <p class="noprint" style="margin-top:18px"><a href="/">← Torna all’applicazione</a> · <a href="#" onclick="window.print();return false;">🖨️ Stampa / salva in PDF</a> · <a href="en.html">🇬🇧 English version</a></p>
+  <p class="noprint" style="margin-top:18px"><a href="/">← Torna all’applicazione</a> · <a href="#" data-print>🖨️ Stampa / salva in PDF</a> · <a href="en.html">🇬🇧 English version</a></p>
 </section>
 </div>
 <a class="top noprint" href="#">↑ Indice</a>
 
-<script>
-// posiziona i numeri sugli screenshot (coordinate calcolate da tools/make_manual_shots.py)
-fetch("shots.json").then((r) => r.json()).then((shots) => {
-  document.querySelectorAll("figure.shot").forEach((fig) => {
-    const s = shots[fig.dataset.shot];
-    if (!s) return;
-    s.markers.forEach((m) => {
-      const el = document.createElement("span");
-      el.className = "mk"; el.textContent = m.n;
-      el.style.left = m.x + "%"; el.style.top = m.y + "%";
-      fig.appendChild(el);
-    });
-  });
-});
-</script>
+<script src="markers.js"></script>
 </body>
 </html>

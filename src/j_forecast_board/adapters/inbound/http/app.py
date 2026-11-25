@@ -21,6 +21,7 @@ from ....application.view_model import dataset_meta, to_plain
 from ....application.views.planner import PlanRequest
 from ....domain.forecast import MODEL_REPOS
 from . import dtos, errors, static
+from .security import BrowserGuard
 
 
 def plain(value) -> JSONResponse:
@@ -41,6 +42,8 @@ def create_app(services: Any, on_start: Callable[[], None] | None = None) -> Fas
     )
     auth = services.authenticator
     app.middleware("http")(auth.middleware)
+    guard = BrowserGuard(static.WEB / "index.html", trust_proxy=services.settings.trust_proxy)
+    app.middleware("http")(guard.middleware)  # added last = runs first: refuse before signing in
     errors.install(app)
     _session_routes(app, auth)
     _catalog_routes(app, services)

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { api } from "../core/api.js";
-import { C, label, layout, line, PCONF, rgba, unitAxis, vline, vrect } from "../core/charts.js";
+import { band, C, label, layout, line, PCONF, rgba, unitAxis, vline, vrect } from "../core/charts.js";
 import { $, $$, esc } from "../core/dom.js";
-import { chip, MET, mfmt, ms, pct } from "../core/format.js";
+import { chip, csvCell, MET, mfmt, ms, pct } from "../core/format.js";
 import { common, S, variant } from "../core/state.js";
 import { withBusy } from "../core/ui.js";
 import { metricTable } from "../tabs/overview.js";
@@ -16,10 +16,10 @@ export function initSeries() {
   $("#seCsv").onclick = () => {
     const r = S.se; if (!r?.future) return;
     const f = r.future;
-    const rows = ["date,forecast,p10,p90,p5,p95", ...r.future_dates.map((d, i) => `${d},${f.median[i]},${f.lo[i]},${f.hi[i]},${f.lo90[i]},${f.hi90[i]}`)];
+    const rows = ["date,forecast,p10,p90,p5,p95", ...r.future_dates.map((d, i) => [d, f.median[i], f.lo[i], f.hi[i], f.lo90[i], f.hi90[i]].map(csvCell).join(","))];
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv" }));
-    a.download = `timestral_${r.meta.key}_${r.id}.csv`; a.click();
+    a.download = `forecast_${r.meta.key}_${r.id}.csv`; a.click();
   };
 }
 export async function runSeries() {

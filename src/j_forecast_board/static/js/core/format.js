@@ -21,3 +21,9 @@ export const MET = {
   secs: ["Time", (v) => dur(v)],
 };
 export const mfmt = (k, v) => (MET[k] ? MET[k][1](v) : fmt(v));
+
+/** One CSV cell: text that a spreadsheet would run as a formula gets a leading quote (numbers are left alone). */
+export function csvCell(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return /^[=+\-@\t\r]/.test(text) && Number.isNaN(Number(text)) ? `'${text}` : text;
+}

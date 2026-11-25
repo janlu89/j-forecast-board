@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { api } from "../core/api.js";
-import { C, label, layout, line, PCONF, unitAxis, vline } from "../core/charts.js";
+import { band, C, label, layout, line, PCONF, unitAxis, vline } from "../core/charts.js";
 import { $, $$, esc } from "../core/dom.js";
 import { chip, dur, fmt, spct } from "../core/format.js";
 import { common, ds, S } from "../core/state.js";
