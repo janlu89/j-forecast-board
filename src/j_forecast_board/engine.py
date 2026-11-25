@@ -21,6 +21,8 @@ MODELS = {
     "mistralai/Timestral-123M": "Timestral-123M",
     "mistralai/Timestral-209M": "Timestral-209M",
 }
+if settings.current().model == "stub":  # visible everywhere a model name is shown
+    MODELS = {repo: f"{name} · stub" for repo, name in MODELS.items()}
 Q_LEVELS = [0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85,
             0.9, 0.95, 0.99]
 
@@ -34,6 +36,8 @@ def qi(level: float) -> int:
 
 
 def model_cached(repo: str) -> bool:
+    if settings.current().model == "stub":
+        return True
     try:
         from huggingface_hub import try_to_load_from_cache
 
@@ -47,6 +51,12 @@ def get_model(repo: str):
     if repo not in MODELS:
         raise ValueError(f"Unknown model {repo}")
     with _model_lock:
+        if settings.current().model == "stub":
+            from .stub_model import StubForecaster
+
+            m = _models.setdefault("stub", StubForecaster())
+            Q_LEVELS = list(m.quantile_levels)
+            return m
         if repo in _models:
             return _models[repo]
         from timestral import TimestralForecaster
