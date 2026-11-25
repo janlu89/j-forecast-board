@@ -16,6 +16,12 @@ def serve(args: argparse.Namespace) -> int:
     import uvicorn
 
     config = settings.current()
+    shown_host = "localhost" if config.host in ("127.0.0.1", "::1") else config.host
+    address = f"http://{shown_host}:{config.port}{config.root_path}/"
+    print(f"J-Forecast Board: open {address} in the browser.")
+    if config.model == "stub":
+        print("Model: stub (a stand-in for tests; its numbers are not forecasts).")
+    print("Press Ctrl+C to stop.", flush=True)
     uvicorn.run(
         "j_forecast_board.server:app",
         host=config.host,
