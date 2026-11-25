@@ -1,0 +1,18 @@
+J-Forecast Board
+Copyright 2026 Gianluca Meola
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+Original project: J-Forecast Board by Gianluca Meola. The repository URL is added
+here at the first publication.
+
+Redistributions of this software, modified or not, must keep this NOTICE file
+and the copyright notices in the source files (Apache License 2.0, section 4).
+
+Model weights
+The Timestral model weights by Mistral AI are not included in this product. They
+are downloaded by the user from Hugging Face and are distributed under their own
+licence ("Modified MIT"), which has conditions of its own.
+
+Third-party software included in this product
+- plotly.js v4.1.1 (webapp/static/vendor/plotly.min.js), Copyright 2012-2026 Plotly, Inc.,
+  MIT License.
