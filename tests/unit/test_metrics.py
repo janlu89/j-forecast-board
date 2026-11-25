@@ -6,7 +6,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from webapp import engine
+from j_forecast_board import engine
 
 ACTUAL = np.array([10.0, 20.0, 0.0, 40.0])
 PREDICTED = np.array([12.0, 18.0, 5.0, 40.0])

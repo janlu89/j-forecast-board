@@ -8,7 +8,7 @@ import secrets
 
 import pytest
 
-from webapp import agents
+from j_forecast_board import agents
 
 
 @pytest.fixture(autouse=True)

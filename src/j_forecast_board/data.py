@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]  # the source checkout
 # Folder for runtime files (datasets, results, credentials, agent settings). JFB_HOME moves it, e.g. for tests.
 HOME = Path(os.environ.get("JFB_HOME") or ROOT)
 DATA_DIR = HOME / "data"

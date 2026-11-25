@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from webapp import data
+from j_forecast_board import data
 
 
 def covariate(values, **extra) -> data.Cov:

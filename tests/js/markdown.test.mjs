@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-// The chat's tiny Markdown renderer (md in webapp/static/app.js). Run: node --test "tests/js/*.test.mjs"
+// The chat's tiny Markdown renderer (md in src/j_forecast_board/static/app.js). Run: node --test "tests/js/*.test.mjs"
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import vm from "node:vm";
 
-const APP = new URL("../../webapp/static/app.js", import.meta.url);
+const APP = new URL("../../src/j_forecast_board/static/app.js", import.meta.url);
 
 /** Load `esc` and `md` from the legacy script, which is not a module yet. */
 function loadRenderer() {

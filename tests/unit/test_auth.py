@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from webapp import auth
+from j_forecast_board import auth
 
 
 def test_a_signed_session_that_has_not_expired_is_valid():

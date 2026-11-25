@@ -6,7 +6,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from webapp import planner
+from j_forecast_board import planner
 
 
 def test_score_counts_lost_sales_and_leftovers():

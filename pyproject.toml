@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "j-forecast-board"
 version = "0.1.0.dev0"
 description = "Local-first forecasting workbench powered by Mistral AI's Timestral models."
-readme = "LEGGIMI.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Gianluca Meola" }]
@@ -43,14 +42,17 @@ dev = [
   "httpx2>=2.16",
 ]
 
-[tool.setuptools]
-packages = ["webapp"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+j_forecast_board = ["static/**/*"]
 
 # ----------------------------------------------------------------------------- ruff
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-extend-exclude = ["webapp/static"]
+extend-exclude = ["src/j_forecast_board/static"]
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I", "UP", "SIM", "N"]
@@ -58,18 +60,40 @@ select = ["E", "F", "B", "I", "UP", "SIM", "N"]
 [tool.ruff.lint.per-file-ignores]
 # Legacy demo layout, kept unchanged until Phase 2 moves each module into src/.
 # Remove an entry as soon as the module it covers is gone.
-"webapp/**" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/agents.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/auth.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/chat.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/data.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/engine.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/evaluate.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/mcp_forecaster.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/openai_agent.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/planner.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
+"src/j_forecast_board/server.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
 "tools/**" = ["E501", "N", "SIM", "UP", "I"]
 "timestral_demo.py" = ["E501", "N", "SIM", "UP", "I"]
 
 [tool.ruff.format]
 # Same legacy exception: formatting these files is a refactor of its own (Phase 2).
-exclude = ["webapp/**", "tools/**", "timestral_demo.py"]
+exclude = [
+  "src/j_forecast_board/agents.py",
+  "src/j_forecast_board/auth.py",
+  "src/j_forecast_board/chat.py",
+  "src/j_forecast_board/data.py",
+  "src/j_forecast_board/engine.py",
+  "src/j_forecast_board/evaluate.py",
+  "src/j_forecast_board/mcp_forecaster.py",
+  "src/j_forecast_board/openai_agent.py",
+  "src/j_forecast_board/planner.py",
+  "src/j_forecast_board/server.py",
+  "tools/**",
+  "timestral_demo.py",
+]
 
 # ----------------------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["."]
+pythonpath = ["src"]
 addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
 markers = [
   "model: needs the Timestral-28M weights in the local Hugging Face cache (never on CI)",
@@ -77,5 +101,5 @@ markers = [
 filterwarnings = ["ignore::DeprecationWarning:fastapi.*", "ignore::DeprecationWarning:starlette.*"]
 
 [tool.coverage.run]
-source = ["webapp"]
+source = ["j_forecast_board"]
 branch = true

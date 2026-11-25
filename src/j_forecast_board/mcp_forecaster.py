@@ -1,6 +1,6 @@
 """Minimal MCP server (stdio, JSON-RPC 2.0) that exposes the demo's forecasting tools to the Claude CLI.
 
-Started by the chat endpoint (webapp/chat.py) for each question; standard library only.
+Started by the chat endpoint (chat.py) for each question; standard library only.
 Every tool calls the running demo API (FORECASTER_URL) with a per-process internal token, so the model,
 data and cached results already loaded in the web app are reused. Charts are written as JSON files to
 FORECASTER_RUN_DIR; the chat endpoint streams them to the page. Claude only sees compact text summaries.

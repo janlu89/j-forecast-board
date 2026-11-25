@@ -18,11 +18,12 @@ import os
 import re
 import secrets
 import time
+from pathlib import Path
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 
-CREDENTIALS = os.path.join(os.environ.get("JFB_HOME") or os.path.dirname(os.path.dirname(__file__)), "accesso_demo.json")
+CREDENTIALS = os.path.join(os.environ.get("JFB_HOME") or str(Path(__file__).resolve().parents[2]), "accesso_demo.json")
 COOKIE = "timestral_session"
 SESSION_DAYS = 30
 # Random per process: lets local helpers (the chat's tool server) call the API without the password.

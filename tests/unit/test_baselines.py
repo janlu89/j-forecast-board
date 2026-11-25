@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from webapp import engine
+from j_forecast_board import engine
 
 
 def test_seasonal_fill_repeats_the_last_cycle():

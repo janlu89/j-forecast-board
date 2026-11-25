@@ -1,7 +1,7 @@
 """Timestral web demo – local API + static UI.
 
 Run from the project folder:
-    .venv\\Scripts\\python -m uvicorn webapp.server:app --host 127.0.0.1 --port 8000
+    python -m j_forecast_board serve
 """
 
 from __future__ import annotations

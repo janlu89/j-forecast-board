@@ -1,4 +1,4 @@
-"""Genera gli screenshot del manuale (webapp/static/manual/img) e la posizione dei numeri (shots.json).
+"""Genera gli screenshot del manuale (src/j_forecast_board/static/manual/img) e la posizione dei numeri (shots.json).
 
 Uso (con il server attivo su http://127.0.0.1:8000):
     .venv\\Scripts\\python tools\\make_manual_shots.py
@@ -12,7 +12,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "webapp" / "static" / "manual"
+OUT = ROOT / "src" / "j_forecast_board" / "static" / "manual"
 IMG = OUT / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 URL = "http://127.0.0.1:8000/"

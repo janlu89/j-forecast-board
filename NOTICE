@@ -14,5 +14,5 @@ are downloaded by the user from Hugging Face and are distributed under their own
 licence ("Modified MIT"), which has conditions of its own.
 
 Third-party software included in this product
-- plotly.js v4.1.1 (webapp/static/vendor/plotly.min.js), Copyright 2012-2026 Plotly, Inc.,
+- plotly.js v4.1.1 (src/j_forecast_board/static/vendor/plotly.min.js), Copyright 2012-2026 Plotly, Inc.,
   MIT License.

@@ -26,7 +26,7 @@ SYNTHETIC_KEY = "synthetic"
 @pytest.fixture(scope="session")
 def client(credentials):
     """The current app with only the two fixture datasets plus a synthetic three-series panel."""
-    from webapp import data, evaluate, server
+    from j_forecast_board import data, evaluate, server
 
     data.LOADERS = [data.load_passengers, data.load_bike]  # no download of the other datasets
     with TestClient(server.app) as test_client:
@@ -74,7 +74,7 @@ def synthetic_dataset(data):
 
 def fake_result(ds, evaluate) -> dict:
     """Deterministic quantiles shaped like a real backtest: last cycle repeated, fixed spread."""
-    from webapp import engine
+    from j_forecast_board import engine
 
     levels = np.asarray(engine.Q_LEVELS)
     cuts = evaluate.windows(ds, ds.horizon)

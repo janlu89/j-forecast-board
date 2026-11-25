@@ -19,7 +19,7 @@ pytestmark = pytest.mark.model
 
 @pytest.fixture(scope="module", autouse=True)
 def weights_present():
-    from webapp import engine
+    from j_forecast_board import engine
 
     if not engine.model_cached(MODEL):
         pytest.skip(f"{MODEL} is not in the local Hugging Face cache")
