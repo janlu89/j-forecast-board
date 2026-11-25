@@ -19,9 +19,8 @@ import tempfile
 from pathlib import Path
 
 from . import agents as AG
-from . import auth as A
 from . import openai_agent as OA
-from . import settings
+from .bootstrap import settings
 
 CLAUDE = os.environ.get("TIMESTRAL_CHAT_CLI") or shutil.which("claude") or str(Path.home() / ".local/bin/claude")
 MODEL = os.environ.get("TIMESTRAL_CHAT_MODEL", "opus")
@@ -86,7 +85,7 @@ def _prompt(message: str, history: list[dict], context: dict) -> str:
     return "\n\n".join(parts)
 
 
-async def stream(message: str, history: list[dict], context: dict, port: int):
+async def stream(message: str, history: list[dict], context: dict, port: int, token: str):
     message = (message or "").strip()
     if not message:
         yield _ev("error", text="Empty question.")
@@ -106,19 +105,19 @@ async def stream(message: str, history: list[dict], context: dict, port: int):
         yield _ev("status", text="Another question is being answered, waiting for it to finish…")
     async with _LOCK:
         if agent["kind"] == "openai":
-            async for chunk in _run_openai(agent, message, history, context, port):
+            async for chunk in _run_openai(agent, message, history, context, port, token):
                 yield chunk
             return
         for attempt in (1, 2):
             state = {"failed": False}
-            async for chunk in _run(message, history, context, port, state, last=attempt == 2, model=agent.get("model") or MODEL):
+            async for chunk in _run(message, history, context, port, token, state, last=attempt == 2, model=agent.get("model") or MODEL):
                 yield chunk
             if not state["failed"]:
                 break
             yield _ev("reset", text="The assistant stopped unexpectedly, retrying once…")
 
 
-async def _run_openai(agent: dict, message: str, history: list[dict], context: dict, port: int):
+async def _run_openai(agent: dict, message: str, history: list[dict], context: dict, port: int, token: str):
     """OpenAI-compatible agent: the blocking HTTP loop runs in a thread and hands events over through a queue."""
     loop = asyncio.get_running_loop()
     q: asyncio.Queue = asyncio.Queue()
@@ -130,7 +129,7 @@ async def _run_openai(agent: dict, message: str, history: list[dict], context: d
 
     def work():
         try:
-            res = OA.run(agent, SYSTEM, _prompt(message, history, context), run_dir, port, A.INTERNAL_TOKEN, TIMEOUT, emit)
+            res = OA.run(agent, SYSTEM, _prompt(message, history, context), run_dir, port, token, TIMEOUT, emit)
             emit("done", seconds=res["seconds"], turns=res["turns"])
         except TimeoutError:
             emit("error", text=f"No answer within {TIMEOUT} s: stopped.")
@@ -149,14 +148,14 @@ async def _run_openai(agent: dict, message: str, history: list[dict], context: d
         shutil.rmtree(run_dir, ignore_errors=True)
 
 
-async def _run(message: str, history: list[dict], context: dict, port: int, state: dict, last: bool = True, model: str = MODEL):
+async def _run(message: str, history: list[dict], context: dict, port: int, token: str, state: dict, last: bool = True, model: str = MODEL):
     """One CLI run. On failure sets state['failed']; the error is only shown to the user on the last attempt."""
     run_dir = tempfile.mkdtemp(prefix="timestral-chat-")
     os.chmod(run_dir, 0o700)
     cfg = os.path.join(run_dir, "mcp.json")
     with open(os.open(cfg, os.O_WRONLY | os.O_CREAT, 0o600), "w", encoding="utf-8") as f:
         json.dump({"mcpServers": {"forecaster": {"type": "stdio", "command": sys.executable, "args": [str(MCP_SERVER)],
-                                                 "env": {"FORECASTER_URL": f"http://127.0.0.1:{port}", "FORECASTER_TOKEN": A.INTERNAL_TOKEN,
+                                                 "env": {"FORECASTER_URL": f"http://127.0.0.1:{port}", "FORECASTER_TOKEN": token,
                                                          "FORECASTER_RUN_DIR": run_dir}}}}, f)
     cmd = [CLAUDE, "-p", "--output-format", "stream-json", "--verbose", "--include-partial-messages",
            "--model", model, "--tools", "", "--strict-mcp-config", "--mcp-config", cfg,

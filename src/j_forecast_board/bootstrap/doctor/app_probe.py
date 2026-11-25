@@ -49,13 +49,18 @@ class LocalApp:
         self.port = _free_port()
         self._server = None
         self._cookie = ""
+        self.container = None
 
     def start(self, progress: Callable[[str], None]) -> None:
         import uvicorn
 
-        config = uvicorn.Config(
-            "j_forecast_board.server:app", host="127.0.0.1", port=self.port, log_level="warning"
-        )
+        from .. import settings
+        from ..app_factory import create_app
+        from ..container import build
+
+        self.container = build(settings.current())
+        app = create_app(self.container)
+        config = uvicorn.Config(app, host="127.0.0.1", port=self.port, log_level="warning")
         self._server = uvicorn.Server(config)
         threading.Thread(target=self._server.run, name="doctor-app", daemon=True).start()
         progress("Starting the app (the first start downloads the public datasets)...")
@@ -64,6 +69,9 @@ class LocalApp:
             if time.monotonic() > deadline or self._server.should_exit:
                 raise RuntimeError("the app did not start in time")
             time.sleep(0.2)
+
+    def use_cookie(self, cookie: str) -> None:
+        self._cookie = cookie
 
     def stop(self) -> None:
         if self._server is not None:
@@ -113,7 +121,8 @@ def _start(app: LocalApp, progress) -> Check:
 def _route_checks(app: LocalApp, paths: RuntimePaths, progress) -> list[Check]:
     checks = [
         _route(app, "GET /login", "GET", "/login", expect=200),
-        run_check("app", "POST /login", lambda: _login(app, paths)),
+        run_check("app", "POST /login", lambda: _wrong_password(app)),
+        run_check("app", "session", lambda: _session(app)),
         _route(app, "GET /", "GET", "/", expect=200, html=True),
         _route(app, "GET /static/app.js", "GET", "/static/app.js", expect=200),
         _route(app, "GET /static/vendor/plotly.min.js", "GET", "/static/vendor/plotly.min.js", 200),
@@ -146,19 +155,25 @@ def _route(app, check_id, method, path, expect, body=None, html=False) -> Check:
     return run_check("app", check_id, probe)
 
 
-def _login(app: LocalApp, paths: RuntimePaths) -> Check:
-    stored = json.loads(paths.credentials.read_text(encoding="utf-8"))
-    form = {"username": stored["utente"], "password": stored["password"], "next": ""}
+def _wrong_password(app: LocalApp) -> Check:
+    """The sign-in form answers and refuses a wrong password (the real one is never read)."""
+    form = {"username": "doctor", "password": "not-the-password", "next": ""}
     answer = app.call("POST", "/login", form=form)
-    if answer.status == 303 and app.call("GET", "/api/system").status == 200:
-        return Check("", "", OK, "signed in with the stored credentials")
+    if answer.status == 303 and answer.headers.get("location", "").startswith("login?e=1"):
+        return Check("", "", OK, "a wrong password is refused")
+    return Check("", "", FAIL, f"unexpected answer to a wrong password (HTTP {answer.status})")
+
+
+def _session(app: LocalApp) -> Check:
+    """A signed session cookie opens the API, as after a real sign-in."""
+    expires = int(time.time()) + 600
+    app.use_cookie(f"jfb_session={app.container.credentials.session(expires)}")
+    if app.call("GET", "/api/system").status == 200:
+        return Check("", "", OK, "a signed session opens the API")
     return Check(
-        "",
-        "",
-        FAIL,
-        f"sign-in failed (HTTP {answer.status})",
-        "Delete secrets/credentials.json under JFB_HOME and start again.",
-    )  # noqa: E501
+        "", "", FAIL, "the session cookie was not accepted",
+        "Delete secrets/session.key under JFB_HOME and start again.",
+    )  # fmt: skip
 
 
 def _datasets(app: LocalApp) -> Check:

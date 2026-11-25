@@ -5,23 +5,29 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from fastapi.testclient import TestClient
 
-from j_forecast_board import engine, settings
-from j_forecast_board.stub_model import StubForecaster
-
-
-@pytest.fixture
-def stub_model(monkeypatch, scratch_home):
-    stub = settings.Settings(home=scratch_home, model="stub")
-    monkeypatch.setattr(settings, "current", lambda: stub)
-    monkeypatch.setattr(engine, "_models", {})
-    monkeypatch.setattr(engine, "Q_LEVELS", list(engine.Q_LEVELS))
-    return stub
+from j_forecast_board.adapters.outbound.datasets.builtin import bike, passengers
+from j_forecast_board.adapters.outbound.models.stub_model import StubModel
+from j_forecast_board.bootstrap.app_factory import create_app
+from j_forecast_board.bootstrap.container import build
+from j_forecast_board.bootstrap.settings import Settings
 
 
-def test_the_engine_hands_out_the_stub(stub_model):
-    assert isinstance(engine.get_model("mistralai/Timestral-28M"), StubForecaster)
-    assert engine.model_cached("mistralai/Timestral-209M")
+@pytest.fixture(scope="module")
+def stub_client(scratch_home, credentials):
+    settings = Settings(home=scratch_home, model="stub", offline=True, background_eval=False)
+    container = build(settings, loaders={"passengers": passengers.load, "bike": bike.load})
+    with TestClient(create_app(container)) as client:
+        client.auth = credentials
+        yield client
+
+
+def test_the_container_hands_out_the_stub(stub_client):
+    container = stub_client.app.state.container
+    assert isinstance(container.model, StubModel)
+    assert container.model.is_available("mistralai/Timestral-209M")
+    assert container.model.display_name("mistralai/Timestral-28M") == "Timestral-28M · stub"
 
 
 ROUTES = [
@@ -31,22 +37,37 @@ ROUTES = [
     ("api/split", {"dataset": "passengers"}),
     ("api/whatif", {"dataset": "bike", "edits": [{"name": "Holiday", "mode": "set", "value": 1}]}),
     ("api/anomalies", {"dataset": "passengers", "windows": 4}),
-    ("api/live", {"dataset": "synthetic", "series": 2}),
 ]
 
 
 @pytest.mark.parametrize(("path", "body"), ROUTES, ids=[f"{p}-{b['dataset']}" for p, b in ROUTES])
-def test_on_demand_route_answers_with_the_stub(client, stub_model, path, body):
-    response = client.post(path, json=body)
+def test_on_demand_route_answers_with_the_stub(stub_client, path, body):
+    response = stub_client.post(path, json=body)
     assert response.status_code == 200, response.text
     numbers = [v for v in _floats(response.json()) if v is not None]
     assert numbers and np.isfinite(numbers).all()
 
 
-def test_live_forecast_of_the_stub_repeats_the_last_cycle(client, stub_model):
-    body = client.post("api/live", json={"dataset": "passengers"}).json()
-    last_year = body["y"][-12:]
-    assert body["forecast"]["median"] == pytest.approx(last_year, rel=1e-4)
+def test_live_forecast_of_the_stub_repeats_the_last_cycle(stub_client):
+    body = stub_client.post("api/live", json={"dataset": "passengers"}).json()
+    assert body["forecast"]["median"] == pytest.approx(body["y"][-12:], rel=1e-4)
+    assert body["model"] == "Timestral-28M · stub"
+
+
+def test_the_stub_evaluates_a_dataset_in_the_background(stub_client):
+    import time
+
+    run = stub_client.post(
+        "api/run", json={"dataset": "passengers", "variant": "mistralai/Timestral-5M|cov|missing"}
+    )
+    assert run.status_code == 200
+    for _ in range(200):
+        status = stub_client.post("api/status", json={"dataset": "passengers"}).json()
+        states = {v["key"]: v["state"] for v in status["variants"]}
+        if states["mistralai/Timestral-5M|cov|missing"] == "done":
+            break
+        time.sleep(0.05)
+    assert states["mistralai/Timestral-5M|cov|missing"] == "done"
 
 
 def _floats(value):

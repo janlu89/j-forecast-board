@@ -7,7 +7,7 @@ from pathlib import Path, PureWindowsPath
 
 import pytest
 
-from j_forecast_board.settings import Settings, SettingsError, default_home
+from j_forecast_board.bootstrap.settings import Settings, SettingsError, default_home
 
 
 def test_defaults_without_any_variable(tmp_path):

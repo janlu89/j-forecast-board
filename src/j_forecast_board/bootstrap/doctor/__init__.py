@@ -49,8 +49,6 @@ def run(mode: str, out_dir: Path) -> int:
     print()
     print(report.to_text(redactor))
     print(f"Report written to {text_path} and {json_path.name}.")
-    if mode != "basic":
-        print(f"Sign-in details are in {paths.credentials} (not in the report).")
     return report.exit_code
 
 

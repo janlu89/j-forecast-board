@@ -6,7 +6,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from j_forecast_board.stub_model import QUANTILE_LEVELS, StubForecaster
+from j_forecast_board.adapters.outbound.models.stub_model import QUANTILE_LEVELS, StubForecaster
 
 WEEK = np.array([10.0, 12, 11, 13, 20, 25, 8])
 

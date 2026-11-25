@@ -47,11 +47,8 @@ def test_login_sets_a_session_cookie_that_opens_the_api(client, credentials):
     assert browser.get("api/datasets").status_code == 200
 
 
-def test_login_can_be_switched_off(client, monkeypatch, scratch_home):
-    from j_forecast_board import settings
-
-    no_login = settings.Settings(home=scratch_home, auth="off")
-    monkeypatch.setattr(settings, "current", lambda: no_login)
+def test_login_can_be_switched_off(client, container, monkeypatch):
+    monkeypatch.setattr(container.authenticator, "enabled", False)
     assert anonymous(client).get("api/datasets").status_code == 200
 
 

@@ -10,8 +10,16 @@ from pathlib import Path
 
 import pandas as pd
 
-from j_forecast_board.doctor import app_probe, network
-from j_forecast_board.doctor.report import FAIL, OK, WARN, Check, Redactor, Report, run_check
+from j_forecast_board.bootstrap.doctor import app_probe, network
+from j_forecast_board.bootstrap.doctor.report import (
+    FAIL,
+    OK,
+    WARN,
+    Check,
+    Redactor,
+    Report,
+    run_check,
+)
 
 HOME = Path("/home/alice")
 
@@ -112,7 +120,7 @@ def test_only_the_session_cookie_is_kept():
 
 def test_a_launcher_that_says_the_cli_is_missing_counts_as_not_installed(monkeypatch):
     # VS Code puts a 'copilot' shim on PATH that only prints how to install the real CLI
-    from j_forecast_board.doctor import environment
+    from j_forecast_board.bootstrap.doctor import environment
 
     shim = "GitHub Copilot CLI was not found. Run copilot in a terminal to install it."
     monkeypatch.setattr(environment.shutil, "which", lambda name: "C:/VS Code/bin/copilot.EXE")

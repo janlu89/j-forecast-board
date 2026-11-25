@@ -19,7 +19,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from . import paths
+from .bootstrap import paths
 
 CONFIG = paths.current().agent_settings
 # Some APIs sit behind Cloudflare, which rejects the default "Python-urllib" User-Agent (Groq: HTTP 403, error 1010).

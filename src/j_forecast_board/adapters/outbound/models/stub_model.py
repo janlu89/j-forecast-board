@@ -13,6 +13,8 @@ from statistics import NormalDist
 
 import numpy as np
 
+from .batched import BatchedQuantileModel
+
 QUANTILE_LEVELS = [0.01, *(round(0.05 * i, 2) for i in range(1, 20)), 0.99]  # as Timestral
 CANDIDATE_PERIODS = (24, 12, 7, 52, 4)
 _Z = np.array([NormalDist().inv_cdf(level) for level in QUANTILE_LEVELS])
@@ -79,3 +81,20 @@ def _spread(history: np.ndarray, period: int) -> float:
         return spread
     scale = float(np.nanmean(np.abs(history)))
     return 0.1 * scale if scale > 0 else 1.0
+
+
+class StubModel(BatchedQuantileModel):
+    """ForecastModel adapter around the stub: every size answers, and every name says "stub"."""
+
+    def __init__(self):
+        super().__init__()
+        self._stub = StubForecaster()
+
+    def display_name(self, repo: str) -> str:
+        return f"{super().display_name(repo)} · stub"
+
+    def is_available(self, repo: str) -> bool:
+        return True
+
+    def _load(self, repo: str) -> StubForecaster:
+        return self._stub

@@ -8,7 +8,7 @@ import stat
 
 import pytest
 
-from j_forecast_board.paths import RuntimePaths
+from j_forecast_board.bootstrap.paths import RuntimePaths
 
 
 def test_layout_under_the_home_folder(tmp_path):

@@ -75,10 +75,10 @@ def test_total_view_refuses_a_single_series(client):
     assert "single series" in response.json()["error"]
 
 
-def test_unknown_dataset_is_an_error(client):
+def test_unknown_dataset_is_not_found(client):
     response = as_browser(client).post("api/overview", json={"dataset": "nope"})
-    assert response.status_code == 400
-    assert response.json() == {"error": "ValueError: Unknown dataset nope"}
+    assert response.status_code == 404
+    assert response.json() == {"error": "Unknown dataset nope"}
 
 
 def test_upload_preview_of_the_sample_file(client, golden, repo_root):
