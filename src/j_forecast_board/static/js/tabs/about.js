@@ -59,7 +59,7 @@ export async function renderAbout() {
     <li>Mistral AI for Timestral: <a href="https://mistral.ai/news/timestral/" target="_blank" rel="noopener">announcement</a>,
       <a href="https://github.com/mistralai/timestral" target="_blank" rel="noopener">code</a>,
       <a href="https://huggingface.co/mistralai" target="_blank" rel="noopener">models on Hugging Face</a>.</li>
-    <li>Thanks to <a href="https://github.com/simone-rizzo" target="_blank" rel="noopener">Simone Rizzo</a> for sharing the idea that sparked
+    <li>Thanks to <a href="https://github.com/simone-rizzo" target="_blank" rel="noopener">Simone Rizzo (@simone-rizzo)</a> for sharing the idea that sparked
       this project. He is not involved in it and has not reviewed or endorsed it.</li>
     <li><a href="https://plotly.com/javascript/" target="_blank" rel="noopener">Plotly.js</a> (MIT) for the charts; the public datasets'
       authors (UCI, ETDataset, Open Power System Data, Box &amp; Jenkins, Australian Bureau of Meteorology).</li>

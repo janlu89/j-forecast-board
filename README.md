@@ -219,7 +219,7 @@ Timestral-28M from your Hugging Face cache.
   ([5M](https://huggingface.co/mistralai/Timestral-5M), [28M](https://huggingface.co/mistralai/Timestral-28M),
   [123M](https://huggingface.co/mistralai/Timestral-123M), [209M](https://huggingface.co/mistralai/Timestral-209M)),
   [documentation](https://docs.mistral.ai/models/timestral-1-0-123m).
-- Thanks to [Simone Rizzo](https://github.com/simone-rizzo) for sharing the idea that sparked this
+- Thanks to [Simone Rizzo (@simone-rizzo)](https://github.com/simone-rizzo) for sharing the idea that sparked this
   project. He is not involved in it and has not reviewed or endorsed it.
 - [Plotly.js](https://plotly.com/javascript/) (MIT) for the charts.
 - The public datasets and their authors: Kaggle "Rossmann Store Sales", UCI Bike Sharing (Fanaee-T
@@ -238,4 +238,4 @@ repository** button gives a ready citation (from `CITATION.cff`).
 
 - Licence: [Apache License 2.0](LICENSE), Copyright 2026 Gianluca Meola. See [NOTICE](NOTICE).
 - Security: please report vulnerabilities privately, see [SECURITY.md](SECURITY.md).
-- Contributing: see [CONTRIBUTING.md](CONTRIBUTING.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+- Contributing: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md). Changes: [CHANGELOG.md](CHANGELOG.md).
