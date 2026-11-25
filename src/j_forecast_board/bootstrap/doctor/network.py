@@ -35,9 +35,15 @@ HOSTS = {  # check id -> (URL, what it is needed for)
     ),
 }
 PROXY_VARIABLES = (
-    "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "PIP_INDEX_URL", "PIP_CERT",
-    "REQUESTS_CA_BUNDLE", "SSL_CERT_FILE", "HF_ENDPOINT",
-)  # fmt: skip
+    "HTTPS_PROXY",
+    "HTTP_PROXY",
+    "NO_PROXY",
+    "PIP_INDEX_URL",
+    "PIP_CERT",
+    "REQUESTS_CA_BUNDLE",
+    "SSL_CERT_FILE",
+    "HF_ENDPOINT",
+)
 
 
 def network_checks() -> list[Check]:

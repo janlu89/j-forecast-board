@@ -42,6 +42,7 @@ class Settings:
     background_eval: bool = True
     chat_timeout: int = 240
     log_level: str = "info"
+    policy_file: Path | None = None  # default: config/policy.json under home
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> Settings:
@@ -59,6 +60,7 @@ class Settings:
             background_eval=reader.flag("JFB_BACKGROUND_EVAL", True),
             chat_timeout=reader.integer("JFB_CHAT_TIMEOUT", 240, minimum=1, maximum=3600),
             log_level=reader.choice("JFB_LOG_LEVEL", "info", LOG_LEVELS),
+            policy_file=Path(env["JFB_POLICY_FILE"]) if env.get("JFB_POLICY_FILE") else None,
         )
         settings.check_exposure()
         return settings

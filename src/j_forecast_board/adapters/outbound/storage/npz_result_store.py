@@ -68,10 +68,16 @@ class NpzResultStore:
 def _result(arrays: dict) -> BacktestResult:
     levels = tuple(float(x) for x in arrays["levels"]) if "levels" in arrays else QUANTILE_LEVELS
     return BacktestResult(
-        bt=arrays["bt"], fut=arrays["fut"], cuts=arrays["cuts"], secs=float(arrays["secs"]),
-        secs_total=float(arrays["secs_total"]), meta=json.loads(str(arrays["meta"])),
-        total_bt=arrays.get("total_bt"), total_fut=arrays.get("total_fut"), levels=levels,
-    )  # fmt: skip
+        bt=arrays["bt"],
+        fut=arrays["fut"],
+        cuts=arrays["cuts"],
+        secs=float(arrays["secs"]),
+        secs_total=float(arrays["secs_total"]),
+        meta=json.loads(str(arrays["meta"])),
+        total_bt=arrays.get("total_bt"),
+        total_fut=arrays.get("total_fut"),
+        levels=levels,
+    )
 
 
 def _write_atomically(path: Path, arrays: dict) -> None:

@@ -54,8 +54,13 @@ class Uploads:
     """Uploaded tables waiting to be registered; they stay in memory only."""
 
     def __init__(
-        self, reader: TableReader, workbench: Workbench, max_bytes: int = MAX_UPLOAD_BYTES
+        self,
+        reader: TableReader,
+        workbench: Workbench,
+        max_bytes: int = MAX_UPLOAD_BYTES,
+        audit=None,
     ):
+        self._audit = audit
         self._reader = reader
         self._workbench = workbench
         self._max_bytes = max_bytes
@@ -80,6 +85,10 @@ class Uploads:
         self._workbench.catalog.register(ds)
         first = self._workbench.default_variants(ds)[0]
         self._workbench.evaluations.submit(ds, ds.horizon, ds.context, first)
+        if self._audit is not None:
+            self._audit.record(
+                "dataset_uploaded", dataset=ds.key, rows=ds.T, series=ds.N, columns=1 + len(ds.covs)
+            )
         return dataset_meta(ds)
 
     def forget(self, key: str) -> None:
@@ -91,3 +100,5 @@ class Uploads:
         self._workbench.evaluations.forget(ds)
         with self._lock:
             self._pending.pop(key.removeprefix("up_"), None)
+        if self._audit is not None:
+            self._audit.record("dataset_deleted", dataset=key)

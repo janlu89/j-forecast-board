@@ -91,8 +91,12 @@ def _commit() -> str:
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
-            cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=10, check=False,
-        )  # fmt: skip
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
     except (OSError, subprocess.TimeoutExpired):
         return "unknown"
     return result.stdout.strip() or "unknown"

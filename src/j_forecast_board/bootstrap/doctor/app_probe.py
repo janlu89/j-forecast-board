@@ -171,9 +171,12 @@ def _session(app: LocalApp) -> Check:
     if app.call("GET", "/api/system").status == 200:
         return Check("", "", OK, "a signed session opens the API")
     return Check(
-        "", "", FAIL, "the session cookie was not accepted",
+        "",
+        "",
+        FAIL,
+        "the session cookie was not accepted",
         "Delete secrets/session.key under JFB_HOME and start again.",
-    )  # fmt: skip
+    )
 
 
 def _datasets(app: LocalApp) -> Check:
@@ -188,9 +191,13 @@ def _datasets(app: LocalApp) -> Check:
             "", "", OK, f"HTTP 200, all {len(loaded)} built-in datasets loaded", details=details
         )
     return Check(
-        "", "", WARN, f"HTTP 200, not loaded: {', '.join(missing)}",
-        "Their download failed: see the network checks, or install the offline bundle.", details,
-    )  # fmt: skip
+        "",
+        "",
+        WARN,
+        f"HTTP 200, not loaded: {', '.join(missing)}",
+        "Their download failed: see the network checks, or install the offline bundle.",
+        details,
+    )
 
 
 def _upload(app: LocalApp, checks: list[Check]) -> str | None:
@@ -206,9 +213,15 @@ def _upload(app: LocalApp, checks: list[Check]) -> str | None:
 
     def register() -> Check:
         body = {
-            "uid": preview["uid"], "date_col": "date", "target": "sales", "id_col": "store",
-            "known": ["promo"], "cat": ["promo"], "calendar": True, "name": "Doctor check",
-        }  # fmt: skip
+            "uid": preview["uid"],
+            "date_col": "date",
+            "target": "sales",
+            "id_col": "store",
+            "known": ["promo"],
+            "cat": ["promo"],
+            "calendar": True,
+            "name": "Doctor check",
+        }
         answer = app.call("POST", "/api/upload/register", body=body)
         if answer.status != 200:
             return Check("", "", FAIL, f"HTTP {answer.status}: {answer.error()}")

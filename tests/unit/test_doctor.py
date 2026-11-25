@@ -54,12 +54,23 @@ def test_report_json_has_the_documented_fields(tmp_path):
     )
     data = json.loads(json_path.read_text(encoding="utf-8"))
     assert list(data) == [
-        "schema_version", "app_version", "commit", "created_at", "mode", "summary", "checks",
-    ]  # fmt: skip
+        "schema_version",
+        "app_version",
+        "commit",
+        "created_at",
+        "mode",
+        "summary",
+        "checks",
+    ]
     assert data["checks"][0] == {
-        "id": "a", "group": "system", "status": "ok", "message": "at ~",
-        "fix": "", "details": {}, "duration_ms": 0,
-    }  # fmt: skip
+        "id": "a",
+        "group": "system",
+        "status": "ok",
+        "message": "at ~",
+        "fix": "",
+        "details": {},
+        "duration_ms": 0,
+    }
     assert "alice" not in text_path.read_text(encoding="utf-8")
 
 

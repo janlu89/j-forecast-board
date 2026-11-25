@@ -63,20 +63,12 @@ ignore = ["N818"]
 [tool.ruff.lint.per-file-ignores]
 # Legacy demo layout, kept unchanged until Phase 2 moves each module into src/.
 # Remove an entry as soon as the module it covers is gone.
-"src/j_forecast_board/agents.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
-"src/j_forecast_board/chat.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
-"src/j_forecast_board/mcp_forecaster.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
-"src/j_forecast_board/openai_agent.py" = ["E501", "E741", "N", "SIM", "UP", "I", "F841", "B008"]
 "tools/**" = ["E501", "N", "SIM", "UP", "I"]
 "timestral_demo.py" = ["E501", "N", "SIM", "UP", "I"]
 
 [tool.ruff.format]
 # Same legacy exception: formatting these files is a refactor of its own (Phase 2).
 exclude = [
-  "src/j_forecast_board/agents.py",
-  "src/j_forecast_board/chat.py",
-  "src/j_forecast_board/mcp_forecaster.py",
-  "src/j_forecast_board/openai_agent.py",
   "tools/**",
   "timestral_demo.py",
 ]
@@ -84,7 +76,7 @@ exclude = [
 # ----------------------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "tests"]
 addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
 markers = [
   "model: needs the Timestral-28M weights in the local Hugging Face cache (never on CI)",
@@ -94,3 +86,36 @@ filterwarnings = ["ignore::DeprecationWarning:fastapi.*", "ignore::DeprecationWa
 [tool.coverage.run]
 source = ["j_forecast_board"]
 branch = true
+
+# ----------------------------------------------------------------------------- import-linter
+# The Dependency Rule (docs/architecture.md): dependencies point inward only.
+[tool.importlinter]
+root_package = "j_forecast_board"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layers: bootstrap -> adapters -> application -> domain"
+type = "layers"
+layers = [
+  "j_forecast_board.bootstrap",
+  "j_forecast_board.adapters",
+  "j_forecast_board.application",
+  "j_forecast_board.domain",
+]
+
+[[tool.importlinter.contracts]]
+name = "Inbound and outbound adapters do not know each other"
+type = "independence"
+modules = ["j_forecast_board.adapters.inbound", "j_forecast_board.adapters.outbound"]
+
+[[tool.importlinter.contracts]]
+name = "The domain uses only the standard library, numpy and pandas"
+type = "forbidden"
+source_modules = ["j_forecast_board.domain"]
+forbidden_modules = ["fastapi", "starlette", "pydantic", "uvicorn", "torch", "timestral", "huggingface_hub", "holidays"]
+
+[[tool.importlinter.contracts]]
+name = "The application layer has no web, model or file-format libraries"
+type = "forbidden"
+source_modules = ["j_forecast_board.application"]
+forbidden_modules = ["fastapi", "starlette", "pydantic", "uvicorn", "torch", "timestral", "huggingface_hub", "holidays"]

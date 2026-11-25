@@ -21,9 +21,17 @@ MAX_SERIES = 5000
 PREVIEW_ROWS = 8
 DATE_SAMPLE = 500
 ID_NAMES = (
-    "store", "id", "series", "item", "sku", "negozio", "punto vendita", "codice", "product",
+    "store",
+    "id",
+    "series",
+    "item",
+    "sku",
+    "negozio",
+    "punto vendita",
+    "codice",
+    "product",
     "prodotto",
-)  # fmt: skip
+)
 SEASON = {"h": 24, "D": 7, "W": 52, "MS": 12, "QS": 4}
 HORIZON = {"h": 48, "D": 28, "W": 13, "MS": 12, "QS": 4}
 REPEAT_PERIOD = {"D": 364, "W": 52, "h": 168}
@@ -63,9 +71,14 @@ class CsvTableReader:
             for row in head.astype(object).values.tolist()
         ]
         return dict(
-            rows=len(df), columns=columns, numeric=numeric, date_guess=date_guess,
-            cat_guess=categorical, id_guess=id_guess, preview=rows,
-        )  # fmt: skip
+            rows=len(df),
+            columns=columns,
+            numeric=numeric,
+            date_guess=date_guess,
+            cat_guess=categorical,
+            id_guess=id_guess,
+            preview=rows,
+        )
 
     def build(self, table: pd.DataFrame, spec: UploadSpec, key: str) -> Dataset:
         df = table.copy()
@@ -114,17 +127,29 @@ class CsvTableReader:
         )
         described = f" for {len(ids)} series ('{spec.id_col}')" if spec.id_col else ""
         return Dataset(
-            key, spec.name or f"Your data · {spec.target}",
+            key,
+            spec.name or f"Your data · {spec.target}",
             f"Uploaded CSV: '{spec.target}'{described}, {len(history)} time steps.",
-            spec.target, grid_freq, season, horizon, 0, history, values, ids=ids,
-            id_label=spec.id_col or "Series", covs=covariates,
+            spec.target,
+            grid_freq,
+            season,
+            horizon,
+            0,
+            history,
+            values,
+            ids=ids,
+            id_label=spec.id_col or "Series",
+            covs=covariates,
             positive_only=bool(np.nanmin(values) >= 0),
             primary="wape" if np.nanmin(values) >= 0 else "mase",
-            repeat_period=REPEAT_PERIOD.get(freq), holidays=holidays, year_lag=YEAR_LAG.get(freq),
-            source="Your CSV (local only)", persist=False,
+            repeat_period=REPEAT_PERIOD.get(freq),
+            holidays=holidays,
+            year_lag=YEAR_LAG.get(freq),
+            source="Your CSV (local only)",
+            persist=False,
             agg="mean" if spec.agg == "mean" else "sum",
             visibility=Visibility.PRIVATE,
-        )  # fmt: skip
+        )
 
 
 def guess_dates(values: pd.Series) -> pd.Series:
@@ -158,7 +183,7 @@ def _as_numbers_if_possible(column: pd.Series) -> pd.Series:
 
 def _infer_frequency(df: pd.DataFrame) -> str:
     first = df[df["__id"] == df["__id"].iloc[0]].sort_values("__d")["__d"]
-    found = pd.infer_freq(first.iloc[-30:]) or pd.infer_freq(first.iloc[:30])
+    found = _frequency(first.iloc[-30:]) or _frequency(first.iloc[:30])
     if found is None:
         raise InvalidRequest("Could not infer the frequency of the dates; choose it manually.")
     freq = {"H": "h", "D": "D", "MS": "MS", "M": "MS", "ME": "MS"}.get(found, found)
@@ -167,6 +192,16 @@ def _infer_frequency(df: pd.DataFrame) -> str:
     if freq.startswith("Q"):
         return "QS"
     return freq
+
+
+def _frequency(dates: pd.Series) -> str | None:
+    """pandas' inferred frequency as a string such as "D", "MS" or "W-SUN"."""
+    try:
+        with pd.option_context("future.infer_freq_returns_offset", True):
+            found = pd.infer_freq(dates)
+    except (TypeError, ValueError):
+        return None
+    return getattr(found, "freqstr", found)
 
 
 def _calendar_covariates(history, freq, n_series, calendar, country, holidays) -> list[Covariate]:

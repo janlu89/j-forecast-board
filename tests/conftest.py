@@ -98,10 +98,22 @@ def synthetic_dataset():
     values = (level + trend) * weekly[None, :] + wiggle
     values[1, 50:53] = np.nan
     return Dataset(
-        SYNTHETIC_KEY, "Synthetic stores", "Three made-up daily series for tests.", "units", "D",
-        season, horizon, 0, dates, values, ids=["A", "B", "C"], id_label="Store",
-        attrs={"Region": ["north", "south", "north"]}, persist=False, source="tests",
-    )  # fmt: skip
+        SYNTHETIC_KEY,
+        "Synthetic stores",
+        "Three made-up daily series for tests.",
+        "units",
+        "D",
+        season,
+        horizon,
+        0,
+        dates,
+        values,
+        ids=["A", "B", "C"],
+        id_label="Store",
+        attrs={"Region": ["north", "south", "north"]},
+        persist=False,
+        source="tests",
+    )
 
 
 def fake_result(ds):
@@ -123,16 +135,23 @@ def fake_result(ds):
 
     total = ds.total()
     meta = dict(
-        variant=DEFAULT_VARIANT, H=ds.horizon, L=ds.context, N=ds.N,
-        created="2026-01-01 00:00", total_v=TOTAL_VERSION,
-    )  # fmt: skip
+        variant=DEFAULT_VARIANT,
+        H=ds.horizon,
+        L=ds.context,
+        N=ds.N,
+        created="2026-01-01 00:00",
+        total_v=TOTAL_VERSION,
+    )
     return BacktestResult(
         bt=np.stack([np.stack([quantiles(ds.Y[s, :c]) for c in cuts]) for s in range(ds.N)]),
         fut=np.stack([quantiles(ds.Y[s]) for s in range(ds.N)]),
-        cuts=np.array(cuts), secs=1.5, secs_total=2.0,
-        total_bt=np.stack([quantiles(total[:c]) for c in cuts]), total_fut=quantiles(total),
+        cuts=np.array(cuts),
+        secs=1.5,
+        secs_total=2.0,
+        total_bt=np.stack([quantiles(total[:c]) for c in cuts]),
+        total_fut=quantiles(total),
         meta=meta,
-    )  # fmt: skip
+    )
 
 
 def pytest_sessionfinish(session, exitstatus):

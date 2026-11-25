@@ -64,11 +64,13 @@ def _os() -> Check:
     details = dict(system=platform.system(), release=platform.release(), machine=platform.machine())
     supported = platform.system() in ("Windows", "Linux")
     return Check(
-        "", "", OK if supported else WARN,
+        "",
+        "",
+        OK if supported else WARN,
         f"{platform.system()} {platform.release()} on {platform.machine()}",
         "" if supported else "Windows 10/11 and Linux are tested; this system is not.",
         details,
-    )  # fmt: skip
+    )
 
 
 def _cpu() -> Check:
@@ -135,20 +137,26 @@ def _python_version() -> Check:
     version = platform.python_version()
     supported = (3, 12) <= sys.version_info[:2] < (3, 15)
     return Check(
-        "", "", OK if supported else FAIL, f"Python {version} ({platform.python_implementation()})",
+        "",
+        "",
+        OK if supported else FAIL,
+        f"Python {version} ({platform.python_implementation()})",
         "Install Python 3.12, 3.13 or 3.14 from python.org, then run the setup script again.",
         dict(version=version, executable=sys.executable),
-    )  # fmt: skip
+    )
 
 
 def _venv() -> Check:
     inside = sys.prefix != sys.base_prefix
     message = "running inside a virtual environment" if inside else "not in a virtual environment"
     return Check(
-        "", "", OK if inside else WARN, message,
+        "",
+        "",
+        OK if inside else WARN,
+        message,
         "Start the app with the start script, which uses the .venv folder created by setup.",
         dict(prefix=sys.prefix),
-    )  # fmt: skip
+    )
 
 
 def _encoding() -> Check:
@@ -158,9 +166,13 @@ def _encoding() -> Check:
         stdout=stream, utf8_mode=bool(sys.flags.utf8_mode), locale=locale.getpreferredencoding()
     )
     return Check(
-        "", "", OK if utf8 else WARN, f"console encoding {stream}",
-        "Set PYTHONUTF8=1 (the start scripts do it), or some symbols print as '?'.", details,
-    )  # fmt: skip
+        "",
+        "",
+        OK if utf8 else WARN,
+        f"console encoding {stream}",
+        "Set PYTHONUTF8=1 (the start scripts do it), or some symbols print as '?'.",
+        details,
+    )
 
 
 def _package(module: str, distribution: str) -> Check:
@@ -191,10 +203,13 @@ def _port_free(host: str, port: int) -> Check:
             probe.bind((host, port))
         except OSError as error:
             return Check(
-                "", "", WARN, f"port {port} on {host} is in use ({error.strerror})",
+                "",
+                "",
+                WARN,
+                f"port {port} on {host} is in use ({error.strerror})",
                 f"Another program uses port {port}: stop it, or start with another port "
                 "(start.ps1 -Port 8010, or JFB_PORT=8010).",
-            )  # fmt: skip
+            )
     return Check("", "", OK, f"port {port} on {host} is free")
 
 
@@ -215,11 +230,14 @@ def _weights(config: Settings) -> Check:
             "", "", OK, f"weights in the local cache: {', '.join(cached)}", details=details
         )
     return Check(
-        "", "", WARN, f"Timestral-{config.default_model_size} weights are not downloaded yet",
+        "",
+        "",
+        WARN,
+        f"Timestral-{config.default_model_size} weights are not downloaded yet",
         "They download from Hugging Face at the first real forecast. Read the weights licence in "
         "the README first. Tests and checks work without them (JFB_MODEL=stub).",
         details,
-    )  # fmt: skip
+    )
 
 
 # ----------------------------------------------------------------------------- clis

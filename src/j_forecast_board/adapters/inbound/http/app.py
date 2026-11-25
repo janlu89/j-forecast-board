@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 import platform
 from collections.abc import Callable
@@ -10,7 +12,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, File, Request, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from ....application.forecasts.split import SplitRequest
 from ....application.forecasts.what_if import Edit, WhatIfRequest
@@ -176,31 +178,110 @@ def _upload_routes(app: FastAPI, services) -> None:
 
 
 def _assistant_routes(app: FastAPI, services) -> None:
-    """The chat panel and its agent settings (legacy modules, replaced in Phase 3)."""
-    from fastapi.responses import StreamingResponse
+    """The 'Ask about this page' panel and its setup."""
+    setup, ask = services.assistant, services.ask
 
-    from .... import agents, chat
+    @app.get("/api/assistant")
+    def assistant():
+        return setup.listing()
+
+    @app.post("/api/assistant/agents/{agent_id}")
+    def save_agent(agent_id: str, r: dtos.AgentBody):
+        return setup.save(agent_id, r.model, r.base_url, r.api_key, r.clear_key)
+
+    @app.post("/api/assistant/agents/{agent_id}/test")
+    def test_agent(agent_id: str, r: dtos.AgentBody):
+        return setup.test(agent_id, r.model, r.base_url, r.api_key)
+
+    @app.post("/api/assistant/agents/{agent_id}/clear")
+    def clear_agent(agent_id: str):
+        return setup.clear(agent_id)
+
+    @app.post("/api/assistant/agents/{agent_id}/revoke")
+    def revoke_consent(agent_id: str):
+        return setup.revoke(agent_id)
+
+    @app.post("/api/assistant/activate")
+    def activate(r: dtos.ActivateBody):
+        return setup.activate(r.id, r.consent, r.private_data)
+
+    @app.post("/api/assistant/deactivate")
+    def deactivate():
+        return setup.deactivate()
+
+    @app.post("/api/assistant/context")
+    def context_level(r: dtos.ContextBody):
+        return setup.set_context_level(r.level)
+
+    @app.post("/api/assistant/detect-local")
+    def detect_local():
+        from ....application.assistant.configuration import detect_local_servers
+
+        return dict(servers=detect_local_servers(services.assistant_agents["local"]))
 
     @app.post("/api/chat")
-    async def ask(r: dtos.ChatBody, request: Request):
-        port = (request.scope.get("server") or ("127.0.0.1", 8000))[1]
-        events = chat.stream(
-            r.message, r.history, r.context, port, services.authenticator.internal_token
-        )
+    async def chat(r: dtos.ChatBody, request: Request):
+        prepared = ask.prepare(r.message, r.history, r.context)  # errors become status codes
+        host, port = request.scope.get("server") or ("127.0.0.1", 8000)
+        local = "127.0.0.1" if host in ("0.0.0.0", "::", "", None) else host
+        events = _stream(lambda emit: ask.answer(prepared, f"http://{local}:{port}", emit))
         headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
         return StreamingResponse(events, media_type="application/x-ndjson", headers=headers)
 
-    @app.get("/api/agents")
-    def agent_list():
-        return agents.listing()
-
-    @app.post("/api/agents")
-    def agent_save(r: dtos.AgentBody):
-        key = "" if r.clear_key else (r.api_key or None)
-        return agents.update(
-            r.id, dict(model=r.model, base_url=r.base_url, api_key=key), r.activate
+    @app.get("/internal/tools")
+    def tool_list(request: Request):
+        _check_tool_token(services, request)
+        return dict(
+            tools=[
+                dict(name=t.name, description=t.description, inputSchema=t.schema)
+                for t in ask_tools(services)
+            ]
         )
 
-    @app.post("/api/agents/test")
-    def agent_test(r: dtos.AgentBody):
-        return agents.test(r.id, dict(model=r.model, base_url=r.base_url, api_key=r.api_key))
+    @app.post("/internal/tools/{name}")
+    async def tool_call(name: str, request: Request):
+        token = request.headers.get(TOOLS_TOKEN, "")
+        arguments = await request.json()
+        result = await asyncio.get_running_loop().run_in_executor(
+            None, lambda: services.tool_gateway.call(token, name, arguments)
+        )
+        return dict(text=result.text)
+
+
+TOOLS_TOKEN = "x-tools-token"
+
+
+def ask_tools(services):
+    from ....application.assistant.tools import SPECS
+
+    return SPECS
+
+
+def _check_tool_token(services, request: Request) -> None:
+    from ....domain.errors import NotFound
+
+    if not services.tool_gateway.is_open(request.headers.get(TOOLS_TOKEN, "")):
+        raise NotFound("No open answer for this token.")
+
+
+async def _stream(work):
+    """Run a blocking answer in a worker thread and yield its events as NDJSON lines."""
+    loop = asyncio.get_running_loop()
+    events: asyncio.Queue = asyncio.Queue()
+
+    def emit(kind: str, **fields) -> None:
+        line = (json.dumps(dict(type=kind, **fields), default=str) + "\n").encode()
+        loop.call_soon_threadsafe(events.put_nowait, line)
+
+    def run() -> None:
+        try:
+            work(emit)
+        finally:
+            loop.call_soon_threadsafe(events.put_nowait, None)
+
+    task = loop.run_in_executor(None, run)
+    try:
+        while (line := await events.get()) is not None:
+            yield line
+    finally:
+        await task

@@ -20,9 +20,13 @@ def ds(make_dataset):
 
 def result() -> BacktestResult:
     return BacktestResult(
-        bt=np.zeros((1, 2, 4, 21)), fut=np.ones((1, 4, 21)), cuts=np.array([22, 26]),
-        secs=1.0, secs_total=2.0, meta={"total_v": 2},
-    )  # fmt: skip
+        bt=np.zeros((1, 2, 4, 21)),
+        fut=np.ones((1, 4, 21)),
+        cuts=np.array([22, 26]),
+        secs=1.0,
+        secs_total=2.0,
+        meta={"total_v": 2},
+    )
 
 
 def test_file_name_uses_the_model_id(tmp_path, ds):

@@ -85,9 +85,17 @@ class ChatBody(BaseModel):
 
 
 class AgentBody(BaseModel):
-    id: str
     model: str | None = None
     base_url: str | None = None
     api_key: str | None = None  # None or "" = keep the saved key
     clear_key: bool = False
-    activate: bool = False
+
+
+class ActivateBody(BaseModel):
+    id: str
+    consent: bool = False  # the user ticked "send my questions and this page to ..."
+    private_data: bool = False  # second confirmation, only when the policy allows it
+
+
+class ContextBody(BaseModel):
+    level: str
