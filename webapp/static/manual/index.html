@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guida pratica · Demo Timestral</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ff7a1a'/%3E%3Cpath d='M3 4h10M3 8h10M3 12h6' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<style>
+  :root { --o: #ff7a1a; --g: #16a34a; --gl: #34d399; --ink: #1f2430; --mut: #5d6475; --bg: #f6f5f2; --card: #fff; --line: #e6e3dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
+  a { color: #c2410c; }
+  h1 { font-size: 38px; line-height: 1.15; margin: 8px 0 6px; letter-spacing: -.5px; }
+  h2 { font-size: 27px; margin: 0 0 6px; letter-spacing: -.3px; display: flex; align-items: center; gap: 12px; }
+  h2 .ico { font-size: 30px; }
+  h3 { font-size: 19px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { font-size: 19px; color: var(--mut); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px 30px; margin: 22px 0; }
+  .hero { background: linear-gradient(135deg, #1b1f2a, #2b2118); color: #f3f1ec; border: 0; position: relative; }
+  .lang { position: absolute; top: 22px; right: 24px; display: flex; gap: 6px; }
+  .lang a { color: #f3f1ec; text-decoration: none; border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 3px 12px; font-weight: 700; font-size: 13px; }
+  .lang a.on { background: var(--o); border-color: var(--o); }
+  @media (max-width: 700px) { .lang { position: static; margin-bottom: 10px; } }
+  @media print { .lang { display: none; } }
+  .hero .lead { color: #d6d0c4; }
+  .tag { display: inline-block; background: var(--o); color: #fff; font-weight: 700; font-size: 13px; padding: 3px 10px; border-radius: 99px; letter-spacing: .3px; }
+  .purpose { background: #fff4ea; border-left: 5px solid var(--o); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 10px 0 14px; font-size: 17px; }
+  .when { color: var(--mut); margin: 0 0 6px; }
+  .tip, .warn { padding: 12px 16px; border-radius: 10px; margin: 14px 0; }
+  .tip { background: #ecfdf3; border: 1px solid #b7ebcb; }
+  .warn { background: #fff7e6; border: 1px solid #f7d79b; }
+  .tip b:first-child, .warn b:first-child { margin-right: 4px; }
+  /* indice */
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 14px; }
+  .toc a { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--ink); text-decoration: none; font-weight: 600; }
+  .toc a:hover { border-color: var(--o); }
+  .toc a span { font-size: 22px; }
+  /* analogia */
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin: 16px 0; }
+  .flow .st { flex: 1 1 170px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; }
+  .flow .st .big { font-size: 36px; }
+  .flow .st b { display: block; margin: 4px 0; }
+  .flow .ar { align-self: center; font-size: 26px; color: var(--o); font-weight: 700; }
+  .hero .flow .st { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); color: #f3f1ec; }
+  /* colori */
+  .colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .col { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fff; }
+  .sw { flex: 0 0 54px; height: 30px; border-radius: 6px; background: #12151c; position: relative; overflow: hidden; }
+  .sw i { position: absolute; left: 6px; right: 6px; top: 14px; height: 3px; border-radius: 2px; }
+  .sw.band i { top: 6px; height: 18px; opacity: .45; }
+  .sw.dash i { background: repeating-linear-gradient(90deg, #9ca3af 0 5px, transparent 5px 9px) !important; }
+  .sw.dot i { width: 10px; height: 10px; left: 22px; top: 10px; border-radius: 50%; border: 2px solid #fff; }
+  /* screenshot con numeri */
+  figure.shot { position: relative; margin: 14px 0 6px; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(20,20,30,.18); background: #0b0d12; }
+  figure.shot img { display: block; width: 100%; height: auto; }
+  .mk { position: absolute; width: 28px; height: 28px; margin: -2px 0 0 -2px; border-radius: 50%; background: var(--o); color: #fff; font: 700 14px/28px "Segoe UI", sans-serif;
+    text-align: center; box-shadow: 0 0 0 3px #fff, 0 3px 10px rgba(0,0,0,.45); z-index: 2; }
+  figcaption { font-size: 13.5px; color: var(--mut); margin: 6px 2px 0; }
+  ol.legend { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+  ol.legend li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+  ol.legend li::before { content: attr(data-n); width: 28px; height: 28px; border-radius: 50%; background: var(--o); color: #fff; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .en { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; background: #f1efe9; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+  /* percorsi */
+  .path { border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 14px 0; background: #fff; }
+  .path h3 { margin: 0 0 10px; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .steps .s { background: #fff4ea; border: 1px solid #f9c79d; border-radius: 10px; padding: 8px 12px; font-size: 15px; max-width: 250px; }
+  .steps .s b { color: #c2410c; margin-right: 4px; }
+  .steps .a { color: var(--o); font-weight: 700; font-size: 20px; }
+  table.gl { border-collapse: collapse; width: 100%; }
+  table.gl td { border-top: 1px solid var(--line); padding: 9px 8px; vertical-align: top; }
+  table.gl td:first-child { white-space: nowrap; font-weight: 600; width: 210px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+  .kpis div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .kpis b { font-size: 22px; display: block; }
+  .top { position: fixed; right: 18px; bottom: 18px; background: var(--o); color: #fff; text-decoration: none; border-radius: 99px; padding: 10px 16px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+  @media (max-width: 700px) { .kpis { grid-template-columns: 1fr; } h1 { font-size: 30px; } section { padding: 20px 18px; } }
+  @media print {
+    body { background: #fff; font-size: 12.5pt; } .top, .noprint { display: none; } section { break-inside: avoid-page; border: 0; padding: 0; margin: 0 0 18px; }
+    section.page { break-before: page; } figure.shot { box-shadow: none; break-inside: avoid; } .hero { background: #fff; color: var(--ink); } .hero .lead { color: var(--mut); }
+    .hero .flow .st { background: #fff; border-color: var(--line); color: var(--ink); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================================================================ COPERTINA -->
+<section class="hero">
+  <div class="lang"><a href="index.html" class="on">IT</a><a href="en.html">EN</a></div>
+  <span class="tag">GUIDA PRATICA</span>
+  <h1>Demo Timestral<br>come si usa, pagina per pagina</h1>
+  <p class="lead">Per chi non è tecnico e non mastica il linguaggio “da business”. Niente formule: solo cosa vedi sullo schermo, cosa vuol dire e cosa puoi cliccare.</p>
+  <div class="flow">
+    <div class="st"><div class="big">📒</div><b>Guarda il passato</b>i numeri di ogni giorno: vendite, consumi, clienti…</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔁</div><b>Riconosce le abitudini</b>il sabato si vende di più, ad agosto meno, a Natale il picco…</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔮</div><b>Disegna il futuro</b>una linea “più probabile” e una fascia “da qui a qui”</div>
+  </div>
+  <p>È come le <b>previsioni del tempo</b>, ma per i numeri dell’azienda. E come per il meteo, non dice solo “domani 20 gradi”: dice anche
+    “quasi sicuramente tra 17 e 23”. Quella forchetta è la parte più utile.</p>
+</section>
+
+<section class="noprint">
+  <h2><span class="ico">🧭</span> Indice</h2>
+  <div class="toc">
+    <a href="#apri"><span>🔗</span> Come si apre</a>
+    <a href="#colori"><span>🎨</span> I colori: la legenda</a>
+    <a href="#barra"><span>🎛️</span> La barra in alto</a>
+    <a href="#overview"><span>📊</span> Overview</a>
+    <a href="#series"><span>🏪</span> Series</a>
+    <a href="#total"><span>➕</span> Total</a>
+    <a href="#explore"><span>⏪</span> Explore backtest</a>
+    <a href="#live"><span>⚡</span> Live forecast</a>
+    <a href="#split"><span>✂️</span> Split test</a>
+    <a href="#whatif"><span>🎚️</span> What-if</a>
+    <a href="#anomalies"><span>🚨</span> Anomalies</a>
+    <a href="#dati"><span>📤</span> Your data</a>
+    <a href="#percorsi"><span>🗺️</span> Percorsi guidati</a>
+    <a href="#parole"><span>📖</span> Parole difficili</a>
+    <a href="#problemi"><span>🛟</span> Se qualcosa non va</a>
+  </div>
+</section>
+
+<!-- ================================================================ APRIRE -->
+<section id="apri">
+  <h2><span class="ico">🔗</span> Come si apre</h2>
+  <div class="flow">
+    <div class="st"><div class="big">💻</div><b>1. Il PC della demo è acceso</b>e il programma è avviato (file <span class="en">avvia_ui.ps1</span>)</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🌐</div><b>2. Apri il link</b>da qualsiasi computer o telefono, nel browser (Chrome, Edge, Safari…)</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔐</div><b>3. Inserisci utente e password</b>nella finestrella che compare (chiedili a chi gestisce la demo)</div>
+  </div>
+  <p style="font-size:18px">Indirizzo: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a><br>
+    Sul PC stesso funziona anche: <a href="http://localhost:8000/">http://localhost:8000/</a></p>
+  <div class="tip"><b>💡</b> Non serve installare niente: basta il browser. Il sito è protetto da password e i dati che carichi restano sul PC della demo.
+    Il browser ricorda la password finché non lo chiudi.</div>
+  <div class="warn"><b>⚠️</b> Le scritte dell’applicazione sono in inglese. In questa guida trovi sempre il nome inglese del bottone <span class="en">così</span> e accanto cosa significa.</div>
+</section>
+
+<!-- ================================================================ COLORI -->
+<section id="colori">
+  <h2><span class="ico">🎨</span> I colori: la legenda che vale ovunque</h2>
+  <p>Ogni grafico usa sempre gli stessi colori. Imparati questi, sai leggere tutte le pagine.</p>
+  <div class="colors">
+    <div class="col"><div class="sw"><i style="background:#e6e8ee"></i></div><div><b>Bianco</b> – i dati veri che il modello ha potuto vedere.</div></div>
+    <div class="col"><div class="sw"><i style="background:#ff7a1a"></i></div><div><b>Arancione</b> – la “prova sul passato”: un periodo che il modello <b>non</b> ha visto, previsto a occhi chiusi e confrontato con la realtà.</div></div>
+    <div class="col"><div class="sw"><i style="background:#34d399"></i></div><div><b>Verde</b> – il futuro vero, che nessuno conosce ancora.</div></div>
+    <div class="col"><div class="sw band"><i style="background:#34d399"></i></div><div><b>Fascia colorata</b> – il margine. “80%” vuol dire: <b>8 volte su 10</b> il valore vero cade dentro la fascia.</div></div>
+    <div class="col"><div class="sw dash"><i></i></div><div><b>Grigio o giallo tratteggiato</b> – una “regola semplice” (es. “come la settimana scorsa”), per confronto.</div></div>
+    <div class="col"><div class="sw"><i style="background:#a78bfa"></i></div><div><b>Viola</b> – uno scenario inventato da te (“e se facessimo una promozione?”).</div></div>
+    <div class="col"><div class="sw dot"><i style="background:#f87171"></i></div><div><b>Pallino rosso</b> – un giorno strano, fuori dal normale.</div></div>
+    <div class="col"><div class="sw"><i style="background:#60a5fa"></i></div><div><b>Blu</b> – le informazioni di contorno: festività, promozioni, apertura…</div></div>
+  </div>
+  <div class="tip"><b>💡</b> Passando il mouse (o il dito) su un grafico appare una finestrella con i numeri esatti di quel giorno. Con la rotellina o trascinando puoi ingrandire.</div>
+</section>
+
+<!-- ================================================================ BARRA -->
+<section id="barra" class="page">
+  <h2><span class="ico">🎛️</span> La barra in alto (sempre visibile)</h2>
+  <div class="purpose">È il “telecomando”: scegli <b>quali dati</b> guardare, <b>quale negozio</b> e <b>quale versione</b> del modello. Vale per tutte le pagine.</div>
+  <figure class="shot" data-shot="barra"><img src="img/barra.png" alt="Barra in alto"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Le pagine</b> (le linguette): Overview, Series, Total… Clicca per cambiare pagina. La pagina in cui sei è arancione.</div></li>
+    <li data-n="2"><div><span class="en">Dataset</span> = <b>quale raccolta di dati</b>. Ci sono già esempi pubblici (vendite di 1.115 negozi Rossmann, consumi elettrici, noleggi bici, temperature…) e qui compaiono anche i dati che carichi tu.</div></li>
+    <li data-n="3"><div><span class="en">Store</span> / <span class="en">Series</span> = <b>quale negozio</b> (o prodotto, o città). Appare solo se nei dati ce ne sono tanti.</div></li>
+    <li data-n="4"><div><b>Frecce ◀ ▶</b> = negozio precedente / successivo, per sfogliarli uno alla volta.</div></li>
+    <li data-n="5"><div><span class="en">Model</span> = <b>quale versione del cervello</b>. Il numero (5M, 28M, 123M, 209M) indica la grandezza: più grande = di solito più preciso ma più lento.
+      Le scritte dopo il nome dicono come è stato usato: <span class="en">no covariates</span> = senza informazioni di contorno; <span class="en">closed = missing</span> = i giorni di chiusura
+      considerati “vuoti” e non “zero vendite”. Le voci con <span class="en">not computed</span> non sono ancora state calcolate: sceglierle avvia il calcolo.</div></li>
+    <li data-n="6"><div><span class="en">Horizon</span> = <b>quanti giorni (o ore, o mesi) nel futuro</b> prevedere. Cambiarlo rifà i calcoli.</div></li>
+    <li data-n="7"><div><span class="en">Context</span> = <b>quanto passato far leggere</b> al modello (0 = tutto). Di solito non serve toccarlo.</div></li>
+    <li data-n="8"><div><b>Pillola gialla ⏳</b> = un calcolo è in corso in sottofondo: mostra la percentuale e i minuti mancanti. Le pagine si aggiornano da sole quando finisce.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ OVERVIEW -->
+<section id="overview" class="page">
+  <h2><span class="ico">📊</span> Overview – “il modello funziona?”</h2>
+  <div class="purpose">La pagella. Per <b>ogni</b> negozio è stato nascosto l’ultimo periodo, il modello l’ha previsto senza vederlo e poi si è controllato quanto ha sbagliato. Qui trovi il voto complessivo e il confronto con metodi semplici.</div>
+  <p class="when"><b>Quando usarla:</b> per primo, per avere la risposta in 30 secondi.</p>
+  <h3>In alto: il riassunto e i 6 numeri chiave</h3>
+  <figure class="shot" data-shot="overview_kpi"><img src="img/overview_kpi.png" alt="Riassunto e numeri chiave"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>La frase di riassunto</b>: quali date ha visto il modello, quale periodo è stato nascosto (<span class="en">Holdout</span>), fin dove arriva la previsione futura e quale versione è andata meglio.</div></li>
+    <li data-n="2"><div><b>Note</b> su come sono trattati i dati (es. buchi nei dati, giorni di chiusura).</div></li>
+    <li data-n="3"><div><b>Errore medio</b> (<span class="en">MAPE</span>): di quanto sbaglia in media, in percentuale. <b>9,98%</b> = su un giorno da 1.000 € sbaglia in media di circa 100 €.
+      Sotto, in verde, di quanto è migliore della regola semplice più brava.</div></li>
+    <li data-n="4"><div><b>Secondo modo di misurare l’errore</b> (<span class="en">RMSPE</span>, quello della gara Kaggle): punisce di più gli errori grossi. Più basso = meglio.</div></li>
+    <li data-n="5"><div><b>Errore sul volume totale</b> (<span class="en">WAPE</span>): somma di tutti gli errori diviso il venduto totale. È il punto di vista “quanto ho sbagliato sul fatturato”.</div></li>
+    <li data-n="6"><div><b>Affidabilità della fascia</b> (<span class="en">Coverage of the 80% band</span>): quante volte il valore vero è caduto dentro la fascia. Deve essere <b>vicino all’80%</b>:
+      molto meno = il modello è troppo sicuro di sé; molto di più = è troppo prudente.</div></li>
+    <li data-n="7"><div><b>Errore sul totale</b> (es. tutta la catena): sommando tutti i negozi gli errori in parte si compensano, quindi è più basso.</div></li>
+    <li data-n="8"><div><b>Tempo di calcolo</b> su questo normale PC, senza scheda grafica.</div></li>
+  </ol>
+  <h3>Al centro: la classifica</h3>
+  <figure class="shot" data-shot="overview_classifica"><img src="img/overview_classifica.png" alt="Classifica"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Il vincitore</b> 🏆 (riga evidenziata). Le righe arancioni sono Timestral, le altre sono le regole semplici.</div></li>
+    <li data-n="2"><div><b>Una regola semplice</b>, per esempio <span class="en">Mean weekday × promo</span> = “media dello stesso giorno della settimana, con o senza promozione”. Servono a capire se il modello aggiunge valore.</div></li>
+    <li data-n="3"><div><b>Le colonne</b> sono modi diversi di misurare l’errore: per quasi tutte <b>più basso = meglio</b>. Il significato di ognuna è nel capitolo <a href="#parole">Parole difficili</a>.</div></li>
+    <li data-n="4"><div><b>Numero verde</b> = il migliore di quella colonna.</div></li>
+    <li data-n="5"><div><b>Aggiungi al confronto</b>: clicca un bottone ▶ per calcolare un’altra versione del modello (es. la 209M, più grande). Parte in sottofondo; la pillola gialla in alto mostra l’avanzamento.</div></li>
+  </ol>
+  <h3>In basso: dove sbaglia</h3>
+  <figure class="shot" data-shot="overview_grafici"><img src="img/overview_grafici.png" alt="Grafici di analisi"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Errore per passo</b>: quanto sbaglia prevedendo 1 giorno avanti, 2 giorni, … fino all’ultimo. Di solito più è lontano, più sbaglia.</div></li>
+    <li data-n="2"><div><b>Distribuzione per negozio</b>: ogni barra conta quanti negozi hanno quell’errore. Più la “montagna” arancione è a sinistra, meglio è.</div></li>
+    <li data-n="3"><div><b>Errore per giorno della settimana</b>: per esempio la domenica è più difficile.</div></li>
+    <li data-n="4"><div><b>Calibrazione</b>: controlla se le fasce sono oneste. Se la linea arancione sta sulla diagonale tratteggiata, “80%” vuol dire davvero 80%.</div></li>
+    <li data-n="5"><div><b>Errore per gruppo</b> (es. tipo di negozio). Dal menu a destra scegli il raggruppamento.</div></li>
+    <li data-n="6"><div><b>Negozi migliori e peggiori</b>. Clicca una riga per aprire quel negozio nella pagina Series.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ SERIES -->
+<section id="series" class="page">
+  <h2><span class="ico">🏪</span> Series – un negozio alla volta</h2>
+  <div class="purpose">Il grafico di un singolo negozio: cosa è successo, cosa aveva previsto il modello e cosa prevede per il futuro.</div>
+  <p class="when"><b>Quando usarla:</b> per mostrare a qualcuno un esempio concreto (“guarda il negozio 1”). Cambi negozio con le frecce ◀ ▶ in alto.</p>
+  <figure class="shot" data-shot="serie"><img src="img/serie.png" alt="Pagina Series"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Show baseline</span> = <b>mostra la regola semplice</b> (linea grigia tratteggiata) per confrontarla con il modello.</div></li>
+    <li data-n="2"><div><span class="en">All</span> / <span class="en">Last year</span> = mostra <b>tutto lo storico</b> o <b>solo l’ultimo anno</b>.</div></li>
+    <li data-n="3"><div><span class="en">Backtest + future</span> = <b>zoom sulla parte interessante</b>: la prova sul passato e il futuro (vista consigliata).</div></li>
+    <li data-n="4"><div><span class="en">Forecast CSV</span> = <b>scarica la previsione</b> in un file che si apre con Excel (data, valore previsto, minimo e massimo della fascia).</div></li>
+    <li data-n="5"><div><b>Le etichette</b>: numero del negozio, caratteristiche (tipo, assortimento, distanza dal concorrente…), errore su questo negozio e affidabilità della fascia.</div></li>
+    <li data-n="6"><div><b>La legenda</b> dei colori del grafico. Cliccando una voce la nascondi o la mostri.</div></li>
+    <li data-n="7"><div><b>Zona arancione</b> = il periodo nascosto al modello. Linea bianca = come è andata davvero; linea arancione = cosa aveva previsto. <b>Più sono vicine, meglio è.</b></div></li>
+    <li data-n="8"><div><b>Zona verde</b> = il futuro previsto, con la fascia scura (8 volte su 10) e quella più chiara (9 volte su 10).</div></li>
+    <li data-n="9"><div><b>Mini-mappa</b>: trascina i bordi per scegliere il periodo da guardare.</div></li>
+  </ol>
+  <figure class="shot" data-shot="serie_covariate"><img src="img/serie_covariate.png" alt="Covariate e metriche"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Le informazioni di contorno</b> (<span class="en">Covariates</span>) date al modello: vacanze scolastiche, festività, promozioni, apertura… Sono cose che <b>si sanno in anticipo</b> (sai già quando farai una promo o quando chiudi). Le barre blu indicano i giorni “sì”; quelle sbiadite sono stimate.</div></li>
+    <li data-n="2"><div><b>La pagella di questo negozio</b>: le stesse misure dell’Overview, solo per lui.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ TOTAL -->
+<section id="total" class="page">
+  <h2><span class="ico">➕</span> Total – tutta la catena insieme</h2>
+  <div class="purpose">La somma di tutti i negozi. Risponde a: “quanto venderemo in totale?”. Compare solo se nei dati ci sono più negozi.</div>
+  <figure class="shot" data-shot="totale"><img src="img/totale.png" alt="Pagina Total"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Due modi di prevedere il totale</b>: <span class="en">bottom-up</span> (arancione/verde) = prevedo ogni negozio e poi sommo; <span class="en">direct</span> (viola tratteggiato) = prevedo direttamente il totale.</div></li>
+    <li data-n="2"><div><b>Zona arancione</b> = periodo nascosto, per confrontare con la realtà (linea bianca).</div></li>
+    <li data-n="3"><div><b>Classifica sul totale</b>: chi sbaglia meno sul totale della catena.</div></li>
+  </ol>
+  <div class="tip"><b>💡</b> Nei dati Rossmann la somma dei negozi (5,6% di errore) funziona molto meglio che prevedere il totale direttamente: la domenica quasi tutti i negozi sono chiusi e il totale “salta”.</div>
+</section>
+
+<!-- ================================================================ EXPLORE -->
+<section id="explore" class="page">
+  <h2><span class="ico">⏪</span> Explore backtest – la macchina del tempo</h2>
+  <div class="purpose">Scegli un giorno nel passato e fai finta che sia “oggi”: tutto quello che viene dopo <b>sparisce</b> (anche dal grafico) e il modello prevede da lì. Premendo ▶ il tempo scorre e vedi la previsione cambiare man mano che arrivano dati nuovi.</div>
+  <p class="when"><b>Quando usarla:</b> per far vedere “dal vivo” come ragiona il modello, è la pagina più spettacolare in una presentazione.</p>
+  <figure class="shot" data-shot="esplora"><img src="img/esplora.png" alt="Explore backtest"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Frames</span> = <b>quanti “oggi”</b> preparare (20, 40, 80). Più sono, più il movimento è fluido, ma il calcolo dura di più.</div></li>
+    <li data-n="2"><div><span class="en">Look-back</span> = <b>quanto indietro</b> parte il viaggio nel tempo (<span class="en">auto</span> va bene).</div></li>
+    <li data-n="3"><div><span class="en">Compute</span> = <b>prepara</b> la macchina del tempo (pochi secondi). Va premuto una volta.</div></li>
+    <li data-n="4"><div><span class="en">Reveal hidden data</span> = <b>mostra anche cosa è successo davvero</b> dopo “oggi” (linea grigia a puntini), per verificare.</div></li>
+    <li data-n="5"><div><span class="en">Follow “today”</span> = il grafico <b>segue</b> il giorno scelto invece di mostrare tutto il periodo.</div></li>
+    <li data-n="6"><div><span class="en">Speed</span> = <b>velocità</b> della riproduzione.</div></li>
+    <li data-n="7"><div><b>▶ Play / ❚❚ Pausa</b>: fa scorrere il tempo.</div></li>
+    <li data-n="8"><div><b>Cursore</b>: trascinalo per scegliere tu il giorno “oggi”. A destra vedi la data.</div></li>
+    <li data-n="9"><div><b>Errore per ogni “oggi”</b>: barra alta = quella volta ha sbagliato di più. Clicca una barra per saltare a quel giorno.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ LIVE -->
+<section id="live" class="page">
+  <h2><span class="ico">⚡</span> Live forecast – una previsione al volo</h2>
+  <div class="purpose">Scegli un negozio e una data: il modello calcola subito (pochi secondi) cosa succederà dopo. Se la data è nel passato vedi anche com’è andata davvero e il voto.</div>
+  <figure class="shot" data-shot="live"><img src="img/live.png" alt="Live forecast"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Forecast from</span> = <b>da che giorno</b> partire (vuoto = dall’ultimo giorno disponibile, cioè il vero futuro).</div></li>
+    <li data-n="2"><div><span class="en">Forecast</span> = <b>calcola</b>.</div></li>
+    <li data-n="3"><div><span class="en">End of data</span> = <b>prevedi il vero futuro</b>, dall’ultimo dato esistente.</div></li>
+    <li data-n="4"><div><span class="en">− 1 horizon</span> = <b>torna indietro di un periodo</b> (es. 48 giorni) e riprova: utile per fare tante prove di fila.</div></li>
+    <li data-n="5"><div><span class="en">Random date</span> = <b>una data a caso</b>: buono per dimostrare che non è “truccato” su un giorno scelto apposta.</div></li>
+    <li data-n="6"><div><b>Il risultato</b>: errore rispetto alla realtà, affidabilità della fascia e <span class="en">Bias</span> (+ = ha previsto troppo, − = troppo poco).</div></li>
+    <li data-n="7"><div><b>Linea tratteggiata bianca</b> = il giorno da cui parte la previsione. A destra: verde = previsione; grigio a puntini = com’è andata davvero.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ SPLIT -->
+<section id="split" class="page">
+  <h2><span class="ico">✂️</span> Split test – “gli do 2 anni, indovina gli altri 3”</h2>
+  <div class="purpose">Il test più severo. Prendi un pezzo di storia (es. 5 anni), ne fai vedere al modello solo una parte (es. i primi 2) e gli chiedi di prevedere tutto il resto. Poi si confronta, anno per anno e mese per mese, con la realtà e con le regole semplici.</div>
+  <p class="when"><b>Quando usarla:</b> per capire fin dove ci si può fidare (1 mese? 1 anno? 3 anni?). Funziona meglio con dati lunghi: prova <span class="en">Germany electricity</span> o <span class="en">Melbourne temperature</span>, o i tuoi.</p>
+  <figure class="shot" data-shot="split"><img src="img/split.png" alt="Split test"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Data from</span> = <b>da quando</b> partono i dati da usare.</div></li>
+    <li data-n="2"><div><span class="en">Model sees until</span> = <b>fino a quando il modello può guardare</b>. Dopo questa data è tutto nascosto.</div></li>
+    <li data-n="3"><div><span class="en">Forecast until</span> = <b>fino a quando deve prevedere</b>.</div></li>
+    <li data-n="4"><div><span class="en">Run split test</span> = <b>avvia</b> il test con le date scelte.</div></li>
+    <li data-n="5"><div><b>Scorciatoie</b>: <span class="en">5 years: 2 → 3</span> riempie da solo le date (5 anni, 2 visti, 3 da prevedere). Ci sono anche 1→1, 3→1 e 1 anno → 3 mesi.</div></li>
+    <li data-n="6"><div><span class="en">Show best simple rule</span> = mostra/nasconde la <b>regola semplice migliore</b> (linea gialla a puntini).</div></li>
+    <li data-n="7"><div><b>Il riassunto</b>: quanto ha visto, quanto ha previsto, il suo errore (rosso se una regola semplice ha fatto meglio) e quello della regola migliore.</div></li>
+    <li data-n="8"><div><b>La linea di taglio</b>: a sinistra (bianco) quello che il modello ha visto, a destra la previsione (verde) sopra la realtà (grigio).</div></li>
+  </ol>
+  <figure class="shot" data-shot="split_analisi"><img src="img/split_analisi.png" alt="Analisi dello split test"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Errore anno per anno</b>: la barra arancione (Timestral) cresce allontanandosi? Vuol dire che più lontano guarda, meno è preciso: è normale.</div></li>
+    <li data-n="2"><div><b>“Come l’ha fatto”</b> spiegato a parole: quanto ha visto, quanto ha dovuto prevedere, come allarga il margine col tempo e il verdetto finale.</div></li>
+    <li data-n="3"><div><b>La classifica</b> sul periodo nascosto: chi ha sbagliato meno.</div></li>
+  </ol>
+  <figure class="shot" data-shot="split_tabella"><img src="img/split_tabella.png" alt="Tabella mese per mese"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Errore del modello</b> mese per mese: verde = sotto il 5%, rosso = oltre il 15%. “+” = ha previsto più del reale, “−” = meno.</div></li>
+    <li data-n="2"><div><b>Errore della regola semplice</b> nello stesso mese, per confronto.</div></li>
+  </ol>
+  <div class="warn"><b>⚠️</b> Risultato onesto: con i consumi elettrici tedeschi (serie molto regolare) a 3 anni di distanza la regola “stesso giorno dell’anno prima” sbaglia meno (2,9%) di Timestral (4,6%). Con le temperature e i passeggeri aerei invece vince Timestral. Il test serve proprio a scoprirlo sui <b>vostri</b> dati.</div>
+</section>
+
+<!-- ================================================================ WHAT-IF -->
+<section id="whatif" class="page">
+  <h2><span class="ico">🎚️</span> What-if – “e se…?”</h2>
+  <div class="purpose">Cambi le informazioni che conosci in anticipo (promozioni, aperture, festività, meteo previsto) e vedi subito come cambierebbe la previsione. Verde = situazione normale, viola = il tuo scenario.</div>
+  <p class="when"><b>Quando usarla:</b> “se facciamo la promo tutte le settimane quanto vendiamo in più?”, “se chiudiamo la prima settimana quanto perdiamo?”.</p>
+  <figure class="shot" data-shot="whatif"><img src="img/whatif.png" alt="What-if"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Scenari pronti</b>: un clic e parte (es. “promo tutti i giorni feriali”, “nessuna promozione”, “chiuso la prima settimana”).</div></li>
+    <li data-n="2"><div><b>Cosa fare</b> su questa informazione: <span class="en">keep</span> = lascia com’è; <span class="en">set to</span> = imposta un valore; <span class="en">shift by</span> = aggiungi/togli (es. +5 gradi); <span class="en">scale ×</span> = moltiplica (es. ×1,2 = +20%).</div></li>
+    <li data-n="3"><div><b>Il valore</b>: per sì/no, 1 = sì e 0 = no.</div></li>
+    <li data-n="4"><div><b>Quali giorni</b>: da “passo” a “passo”, contando dal primo giorno di previsione (0 = il primo giorno, 7 = una settimana dopo).</div></li>
+    <li data-n="5"><div><span class="en">Run scenario</span> = <b>calcola</b> lo scenario con le tue scelte.</div></li>
+    <li data-n="6"><div><span class="en">Reset</span> = <b>torna alla situazione normale</b>.</div></li>
+    <li data-n="7"><div><b>Il risultato in numeri</b>: totale previsto normale, totale con lo scenario e la differenza (in valore e in %).</div></li>
+    <li data-n="8"><div><b>Legenda</b>: verde = base, viola = scenario. Sotto il grafico vedi anche quali informazioni hai cambiato.</div></li>
+  </ol>
+  <div class="tip"><b>💡</b> Il modello impara l’effetto di una promo dal passato di quel negozio: se in passato le promo spostavano poco, lo scenario sposterà poco.</div>
+</section>
+
+<!-- ================================================================ ANOMALIES -->
+<section id="anomalies" class="page">
+  <h2><span class="ico">🚨</span> Anomalies – i giorni strani</h2>
+  <div class="purpose">Il modello rifà tante piccole previsioni sul passato recente e segna con un <b>pallino rosso</b> ogni giorno che è uscito dalla fascia: guasti, tempeste, errori nei dati, eventi speciali.</div>
+  <figure class="shot" data-shot="anomalie"><img src="img/anomalie.png" alt="Anomalies"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Window length</span> = <b>lunghezza di ogni piccola previsione</b> (es. 7 giorni).</div></li>
+    <li data-n="2"><div><span class="en">Windows</span> = <b>quante</b> farne all’indietro (20 × 7 giorni = circa 5 mesi controllati).</div></li>
+    <li data-n="3"><div><span class="en">Band</span> = <b>quanto essere severi</b>. 98% = segnala solo le cose davvero fuori dal normale; 90% = più sensibile, segnala di più.</div></li>
+    <li data-n="4"><div><span class="en">Detect anomalies</span> = <b>avvia</b> la ricerca.</div></li>
+    <li data-n="5"><div><b>Il riassunto</b>: quanti giorni strani, e la percentuale fuori fascia rispetto a quella “normale per caso” (circa 2% con la fascia al 98%).</div></li>
+    <li data-n="6"><div><b>Pallino rosso</b> = un giorno anomalo; più è grande, più è strano.</div></li>
+    <li data-n="7"><div><b>L’elenco</b>, dal più strano: data, valore vero, valore atteso, la fascia e se era sopra ▲ o sotto ▼.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ DATI -->
+<section id="dati" class="page">
+  <h2><span class="ico">📤</span> Your data – provare con i nostri numeri</h2>
+  <div class="purpose">Carichi un file esportato da Excel e il modello lo analizza come gli esempi. <b>Il file non esce dal PC della demo.</b></div>
+  <h3>Come preparare il file (in Excel)</h3>
+  <div class="flow">
+    <div class="st"><div class="big">📅</div><b>Una colonna con la data</b>es. 01/03/2024</div>
+    <div class="st"><div class="big">🏷️</div><b>(Facoltativa) chi è</b>negozio, prodotto, città… una riga per ognuno e per ogni giorno</div>
+    <div class="st"><div class="big">🔢</div><b>Il numero da prevedere</b>vendite, pezzi, clienti…</div>
+    <div class="st"><div class="big">➕</div><b>(Facoltative) informazioni in più</b>promo sì/no, aperto sì/no, prezzo…</div>
+    <div class="st"><div class="big">💾</div><b>Salva come CSV</b>File → Salva con nome → “CSV (delimitato dal separatore di elenco)”</div>
+  </div>
+  <div class="tip"><b>💡</b> Per provare subito c’è un file di esempio <b>inventato</b> nella cartella del progetto: <span class="en">esempio_vendite_negozi.csv</span> (3 negozi, 2 anni, con promozioni).
+    Se vuoi che il modello sappia le promo future, aggiungi in fondo le righe dei giorni futuri con la promo compilata e la colonna vendite <b>vuota</b> (l’esempio lo fa già per 30 giorni).</div>
+  <figure class="shot" data-shot="dati"><img src="img/dati.png" alt="Your data"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Trascina qui il file</b> o cliccaci sopra per sceglierlo.</div></li>
+    <li data-n="2"><div><b>Anteprima</b>: le prime righe, per controllare che sia il file giusto.</div></li>
+    <li data-n="3"><div><span class="en">Name</span> = il <b>nome</b> con cui comparirà nel menu Dataset.</div></li>
+    <li data-n="4"><div><span class="en">Date column</span> = <b>quale colonna è la data</b> (di solito la trova da solo).</div></li>
+    <li data-n="5"><div><span class="en">Series ID column</span> = <b>quale colonna dice di chi è la riga</b> (negozio, prodotto). Lascia “single series” se il file ha un solo andamento.</div></li>
+    <li data-n="6"><div><span class="en">Forecast this</span> = <b>il numero da prevedere</b>.</div></li>
+    <li data-n="7"><div><b>Le altre colonne</b>: <span class="en">ignore</span> = non usarla; <span class="en">past only</span> = si conosce solo a posteriori (es. clienti entrati);
+      <span class="en">known in advance</span> = si sa prima (promo, apertura, prezzo di listino). <span class="en">category</span> = è un sì/no o un codice, non una quantità.</div></li>
+    <li data-n="8"><div><span class="en">Frequency</span> = ogni quanto c’è un dato (giornaliero, settimanale, mensile…). <span class="en">auto-detect</span> = lo capisce da solo.</div></li>
+    <li data-n="9"><div><span class="en">Season / horizon</span> = lunghezza del ciclo (7 = settimana per dati giornalieri) e quanti passi prevedere. Lasciare <span class="en">auto</span> va benissimo.</div></li>
+    <li data-n="10"><div><span class="en">Totals per period</span> = per i riepiloghi mensili: <b>somma</b> (vendite, pezzi) o <b>media</b> (prezzi, temperature).</div></li>
+    <li data-n="11"><div><span class="en">Calendar features</span> = aggiunge da solo giorno della settimana e mese come informazioni note. Lascialo acceso.</div></li>
+    <li data-n="12"><div><span class="en">Public holidays</span> = aggiunge le <b>festività</b> del paese scelto (IT = Italia).</div></li>
+    <li data-n="13"><div><span class="en">Load dataset</span> = <b>carica</b>. Si apre l’Overview: la pillola gialla mostra il calcolo in corso (secondi per pochi negozi, minuti per centinaia).</div></li>
+  </ol>
+  <div class="warn"><b>⚠️</b> I dati caricati restano in memoria finché il programma resta acceso: se il PC si riavvia vanno ricaricati.</div>
+</section>
+
+<!-- ================================================================ PERCORSI -->
+<section id="percorsi" class="page">
+  <h2><span class="ico">🗺️</span> Percorsi guidati: “voglio…”</h2>
+  <div class="path"><h3>✅ …capire in 2 minuti se funziona</h3><div class="steps">
+    <div class="s"><b>1</b> Dataset: <span class="en">Rossmann</span></div><div class="a">→</div>
+    <div class="s"><b>2</b> Pagina <span class="en">Overview</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Prima scheda: errore medio e “x% better than…”</div><div class="a">→</div>
+    <div class="s"><b>4</b> Quarta scheda: affidabilità vicina all’80%?</div><div class="a">→</div>
+    <div class="s"><b>5</b> Classifica: Timestral è in cima?</div></div></div>
+  <div class="path"><h3>🏪 …mostrare un negozio a un collega</h3><div class="steps">
+    <div class="s"><b>1</b> <span class="en">Overview</span> → tabella “Best and worst”</div><div class="a">→</div>
+    <div class="s"><b>2</b> Clic su un negozio</div><div class="a">→</div>
+    <div class="s"><b>3</b> Si apre <span class="en">Series</span>: arancione vs bianco = prova sul passato</div><div class="a">→</div>
+    <div class="s"><b>4</b> Verde = futuro; <span class="en">Forecast CSV</span> per Excel</div></div></div>
+  <div class="path"><h3>🎬 …fare una dimostrazione “dal vivo”</h3><div class="steps">
+    <div class="s"><b>1</b> Pagina <span class="en">Explore backtest</span></div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Compute</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Spunta <span class="en">Reveal hidden data</span></div><div class="a">→</div>
+    <div class="s"><b>4</b> ▶ e commenta: “ecco cosa sapeva quel giorno, ecco cosa ha previsto”</div></div></div>
+  <div class="path"><h3>✂️ …fare la prova “2 anni visti, 3 da indovinare”</h3><div class="steps">
+    <div class="s"><b>1</b> Dataset con tanti anni (es. <span class="en">Germany electricity</span> o il vostro)</div><div class="a">→</div>
+    <div class="s"><b>2</b> Pagina <span class="en">Split test</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Bottone <span class="en">5 years: 2 → 3</span></div><div class="a">→</div>
+    <div class="s"><b>4</b> Leggi “How the model did it” e la tabella mese per mese</div></div></div>
+  <div class="path"><h3>🏷️ …sapere quanto vale una promozione</h3><div class="steps">
+    <div class="s"><b>1</b> Scegli il negozio in alto</div><div class="a">→</div>
+    <div class="s"><b>2</b> Pagina <span class="en">What-if</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Scenario pronto “Promo every weekday” (o imposta tu Promo = 1 su alcuni giorni)</div><div class="a">→</div>
+    <div class="s"><b>4</b> Leggi “Difference”: quanto in più rispetto al normale</div></div></div>
+  <div class="path"><h3>📤 …provare con i nostri dati</h3><div class="steps">
+    <div class="s"><b>1</b> Excel → salva come CSV</div><div class="a">→</div>
+    <div class="s"><b>2</b> Pagina <span class="en">Your data</span> → trascina il file</div><div class="a">→</div>
+    <div class="s"><b>3</b> Controlla data, “chi è”, numero da prevedere</div><div class="a">→</div>
+    <div class="s"><b>4</b> Promo/aperture = <span class="en">known in advance</span></div><div class="a">→</div>
+    <div class="s"><b>5</b> <span class="en">Load dataset</span> e aspetta la pillola gialla</div></div></div>
+  <div class="path"><h3>🚨 …trovare giorni anomali</h3><div class="steps">
+    <div class="s"><b>1</b> Pagina <span class="en">Anomalies</span></div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Detect anomalies</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Guarda i pallini rossi e l’elenco: cosa è successo quel giorno?</div></div></div>
+</section>
+
+<!-- ================================================================ PAROLE -->
+<section id="parole" class="page">
+  <h2><span class="ico">📖</span> Parole difficili, spiegate semplici</h2>
+  <table class="gl">
+    <tr><td>Forecast</td><td>Previsione.</td></tr>
+    <tr><td>Holdout / backtest</td><td>Il periodo <b>nascosto</b> al modello per metterlo alla prova, come un compito in classe di cui l’insegnante conosce già le risposte.</td></tr>
+    <tr><td>Baseline</td><td>Una regola semplice usata come metro di paragone (es. “come la settimana scorsa”, “come lo stesso giorno dell’anno scorso”).</td></tr>
+    <tr><td>MAPE</td><td>Errore medio in percentuale, giorno per giorno. 10% = in media sbaglia di un decimo. <b>Più basso = meglio.</b></td></tr>
+    <tr><td>WAPE</td><td>Errore sul volume totale: quanto ho sbagliato in tutto rispetto a quanto ho venduto in tutto. Più basso = meglio.</td></tr>
+    <tr><td>RMSPE</td><td>Come il MAPE ma pesa di più gli errori grossi (è la misura della gara Kaggle Rossmann).</td></tr>
+    <tr><td>sMAPE</td><td>Variante “simmetrica” del MAPE. Più basso = meglio.</td></tr>
+    <tr><td>MASE</td><td>Confronto con la regola “ripeti l’ultimo ciclo”: <b>sotto 1 = meglio della regola</b>, sopra 1 = peggio.</td></tr>
+    <tr><td>MAE / RMSE</td><td>Errore medio nell’unità dei dati (es. euro al giorno). RMSE pesa di più gli errori grossi.</td></tr>
+    <tr><td>Bias</td><td>Tendenza: <b>+</b> = prevede sempre un po’ troppo; <b>−</b> = sempre un po’ troppo poco. Vicino a 0 = equilibrato.</td></tr>
+    <tr><td>Coverage 80% (Cov. 80%)</td><td>Quante volte il valore vero è caduto nella fascia. Ideale ≈ 80%.</td></tr>
+    <tr><td>Width 80%</td><td>Quanto è larga la fascia rispetto ai valori: stretta = preciso, larga = prudente.</td></tr>
+    <tr><td>WQL</td><td>Voto all’intera fascia, non solo alla linea centrale. Più basso = meglio.</td></tr>
+    <tr><td>Covariates</td><td>Informazioni di contorno date al modello: promo, aperture, festività, meteo…</td></tr>
+    <tr><td>Known in advance</td><td>Informazioni che si sanno prima (il calendario promo, le chiusure programmate).</td></tr>
+    <tr><td>Past only</td><td>Informazioni che si sanno solo dopo (es. clienti entrati ieri).</td></tr>
+    <tr><td>Closed = missing / = 0</td><td>Come trattare i giorni di chiusura: “vuoti” (consigliato) oppure “zero vendite”.</td></tr>
+    <tr><td>Bottom-up / direct</td><td>Totale ottenuto sommando le previsioni dei singoli negozi / prevedendo direttamente il totale.</td></tr>
+    <tr><td>Horizon</td><td>Quanto avanti prevedere.</td></tr>
+    <tr><td>Context</td><td>Quanto passato far leggere al modello.</td></tr>
+    <tr><td>Zero-shot</td><td>Il modello non viene “addestrato” sui vostri dati: li legge e prevede subito, come una persona esperta che vede un grafico per la prima volta.</td></tr>
+    <tr><td>5M · 28M · 123M · 209M</td><td>Grandezza del modello (milioni di “parametri”). Più grande = di solito più preciso, ma più lento.</td></tr>
+  </table>
+</section>
+
+<!-- ================================================================ PROBLEMI -->
+<section id="problemi" class="page">
+  <h2><span class="ico">🛟</span> Se qualcosa non va</h2>
+  <table class="gl">
+    <tr><td>La pagina non si apre</td><td>Il PC della demo è acceso e il programma è avviato? Sul PC della demo avvia <span class="en">avvia_ui.ps1</span>.</td></tr>
+    <tr><td>Chiede utente e password</td><td>È normale: il sito è protetto. Se la password non viene accettata, chiedila di nuovo a chi gestisce la demo (è nel file <span class="en">accesso_demo.json</span> sul PC della demo).</td></tr>
+    <tr><td>“Timestral is evaluating…”</td><td>È il primo calcolo per quei dati: aspetta, la pillola gialla in alto mostra i minuti mancanti. Poi resta salvato e la volta dopo è istantaneo.</td></tr>
+    <tr><td>Un bottone non fa nulla</td><td>Guarda se compare un riquadro rosso in basso a destra con il messaggio d’errore; spesso indica cosa correggere (es. “too many steps”).</td></tr>
+    <tr><td>Il modello 209M è lentissimo</td><td>È normale su questo PC senza scheda grafica: per 1.115 negozi servono circa 20–25 minuti. Per le prove usa il 28M.</td></tr>
+    <tr><td>Il mio file non viene letto bene</td><td>Controlla che ci sia una sola riga di intestazione, la data in una colonna sola e i numeri senza simboli (niente “€”).</td></tr>
+    <tr><td>I miei dati sono spariti</td><td>Dopo un riavvio del programma i file caricati vanno ricaricati (per scelta: non vengono salvati su disco).</td></tr>
+  </table>
+  <div class="tip"><b>💡</b> Licenza: il modello è gratuito per prove e per aziende sotto i 20 milioni di dollari di fatturato al mese; sopra quella soglia serve una licenza commerciale di Mistral.</div>
+  <p class="noprint" style="margin-top:18px"><a href="/">← Torna all’applicazione</a> · <a href="#" onclick="window.print();return false;">🖨️ Stampa / salva in PDF</a> · <a href="en.html">🇬🇧 English version</a></p>
+</section>
+</div>
+<a class="top noprint" href="#">↑ Indice</a>
+
+<script>
+// posiziona i numeri sugli screenshot (coordinate calcolate da tools/make_manual_shots.py)
+fetch("shots.json").then((r) => r.json()).then((shots) => {
+  document.querySelectorAll("figure.shot").forEach((fig) => {
+    const s = shots[fig.dataset.shot];
+    if (!s) return;
+    s.markers.forEach((m) => {
+      const el = document.createElement("span");
+      el.className = "mk"; el.textContent = m.n;
+      el.style.left = m.x + "%"; el.style.top = m.y + "%";
+      fig.appendChild(el);
+    });
+  });
+});
+</script>
+</body>
+</html>

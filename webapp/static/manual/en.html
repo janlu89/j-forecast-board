@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practical guide · Timestral demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ff7a1a'/%3E%3Cpath d='M3 4h10M3 8h10M3 12h6' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<style>
+  :root { --o: #ff7a1a; --g: #16a34a; --gl: #34d399; --ink: #1f2430; --mut: #5d6475; --bg: #f6f5f2; --card: #fff; --line: #e6e3dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
+  a { color: #c2410c; }
+  h1 { font-size: 38px; line-height: 1.15; margin: 8px 0 6px; letter-spacing: -.5px; }
+  h2 { font-size: 27px; margin: 0 0 6px; letter-spacing: -.3px; display: flex; align-items: center; gap: 12px; }
+  h2 .ico { font-size: 30px; }
+  h3 { font-size: 19px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { font-size: 19px; color: var(--mut); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px 30px; margin: 22px 0; }
+  .hero { background: linear-gradient(135deg, #1b1f2a, #2b2118); color: #f3f1ec; border: 0; position: relative; }
+  .hero .lead { color: #d6d0c4; }
+  .lang { position: absolute; top: 22px; right: 24px; display: flex; gap: 6px; }
+  .lang a { color: #f3f1ec; text-decoration: none; border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 3px 12px; font-weight: 700; font-size: 13px; }
+  .lang a.on { background: var(--o); border-color: var(--o); }
+  .tag { display: inline-block; background: var(--o); color: #fff; font-weight: 700; font-size: 13px; padding: 3px 10px; border-radius: 99px; letter-spacing: .3px; }
+  .purpose { background: #fff4ea; border-left: 5px solid var(--o); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 10px 0 14px; font-size: 17px; }
+  .when { color: var(--mut); margin: 0 0 6px; }
+  .tip, .warn { padding: 12px 16px; border-radius: 10px; margin: 14px 0; }
+  .tip { background: #ecfdf3; border: 1px solid #b7ebcb; }
+  .warn { background: #fff7e6; border: 1px solid #f7d79b; }
+  .tip b:first-child, .warn b:first-child { margin-right: 4px; }
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 14px; }
+  .toc a { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--ink); text-decoration: none; font-weight: 600; }
+  .toc a:hover { border-color: var(--o); }
+  .toc a span { font-size: 22px; }
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin: 16px 0; }
+  .flow .st { flex: 1 1 170px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; }
+  .flow .st .big { font-size: 36px; }
+  .flow .st b { display: block; margin: 4px 0; }
+  .flow .ar { align-self: center; font-size: 26px; color: var(--o); font-weight: 700; }
+  .hero .flow .st { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); color: #f3f1ec; }
+  .colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .col { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fff; }
+  .sw { flex: 0 0 54px; height: 30px; border-radius: 6px; background: #12151c; position: relative; overflow: hidden; }
+  .sw i { position: absolute; left: 6px; right: 6px; top: 14px; height: 3px; border-radius: 2px; }
+  .sw.band i { top: 6px; height: 18px; opacity: .45; }
+  .sw.dash i { background: repeating-linear-gradient(90deg, #9ca3af 0 5px, transparent 5px 9px) !important; }
+  .sw.dot i { width: 10px; height: 10px; left: 22px; top: 10px; border-radius: 50%; border: 2px solid #fff; }
+  figure.shot { position: relative; margin: 14px 0 6px; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(20,20,30,.18); background: #0b0d12; }
+  figure.shot img { display: block; width: 100%; height: auto; }
+  .mk { position: absolute; width: 28px; height: 28px; margin: -2px 0 0 -2px; border-radius: 50%; background: var(--o); color: #fff; font: 700 14px/28px "Segoe UI", sans-serif;
+    text-align: center; box-shadow: 0 0 0 3px #fff, 0 3px 10px rgba(0,0,0,.45); z-index: 2; }
+  ol.legend { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+  ol.legend li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+  ol.legend li::before { content: attr(data-n); width: 28px; height: 28px; border-radius: 50%; background: var(--o); color: #fff; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .en { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; background: #f1efe9; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
+  .path { border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 14px 0; background: #fff; }
+  .path h3 { margin: 0 0 10px; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .steps .s { background: #fff4ea; border: 1px solid #f9c79d; border-radius: 10px; padding: 8px 12px; font-size: 15px; max-width: 250px; }
+  .steps .s b { color: #c2410c; margin-right: 4px; }
+  .steps .a { color: var(--o); font-weight: 700; font-size: 20px; }
+  table.gl { border-collapse: collapse; width: 100%; }
+  table.gl td { border-top: 1px solid var(--line); padding: 9px 8px; vertical-align: top; }
+  table.gl td:first-child { white-space: nowrap; font-weight: 600; width: 210px; }
+  .top { position: fixed; right: 18px; bottom: 18px; background: var(--o); color: #fff; text-decoration: none; border-radius: 99px; padding: 10px 16px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+  @media (max-width: 700px) { h1 { font-size: 30px; } section { padding: 20px 18px; } .lang { position: static; margin-bottom: 10px; } }
+  @media print {
+    body { background: #fff; font-size: 12.5pt; } .top, .noprint, .lang { display: none; } section { break-inside: avoid-page; border: 0; padding: 0; margin: 0 0 18px; }
+    section.page { break-before: page; } figure.shot { box-shadow: none; break-inside: avoid; } .hero { background: #fff; color: var(--ink); } .hero .lead { color: var(--mut); }
+    .hero .flow .st { background: #fff; border-color: var(--line); color: var(--ink); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================================================================ COVER -->
+<section class="hero">
+  <div class="lang"><a href="index.html">IT</a><a href="en.html" class="on">EN</a></div>
+  <span class="tag">PRACTICAL GUIDE</span>
+  <h1>Timestral demo<br>how to use it, page by page</h1>
+  <p class="lead">For people who are not technical and don’t speak “business jargon”. No formulas: just what you see on the screen, what it means and what you can click.</p>
+  <div class="flow">
+    <div class="st"><div class="big">📒</div><b>It looks at the past</b>the numbers of every day: sales, energy use, customers…</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔁</div><b>It recognises habits</b>Saturdays sell more, August less, Christmas is the peak…</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔮</div><b>It draws the future</b>a “most likely” line and a “from here to here” band</div>
+  </div>
+  <p>It works like a <b>weather forecast</b>, but for the company’s numbers. And like the weather, it doesn’t just say “20 degrees tomorrow”:
+    it also says “almost certainly between 17 and 23”. That range is the most useful part.</p>
+</section>
+
+<section class="noprint">
+  <h2><span class="ico">🧭</span> Contents</h2>
+  <div class="toc">
+    <a href="#open"><span>🔗</span> How to open it</a>
+    <a href="#colours"><span>🎨</span> The colours: the key</a>
+    <a href="#bar"><span>🎛️</span> The top bar</a>
+    <a href="#overview"><span>📊</span> Overview</a>
+    <a href="#series"><span>🏪</span> Series</a>
+    <a href="#total"><span>➕</span> Total</a>
+    <a href="#explore"><span>⏪</span> Explore backtest</a>
+    <a href="#live"><span>⚡</span> Live forecast</a>
+    <a href="#split"><span>✂️</span> Split test</a>
+    <a href="#whatif"><span>🎚️</span> What-if</a>
+    <a href="#anomalies"><span>🚨</span> Anomalies</a>
+    <a href="#data"><span>📤</span> Your data</a>
+    <a href="#paths"><span>🗺️</span> Guided paths</a>
+    <a href="#words"><span>📖</span> Difficult words</a>
+    <a href="#problems"><span>🛟</span> If something goes wrong</a>
+  </div>
+</section>
+
+<!-- ================================================================ OPEN -->
+<section id="open">
+  <h2><span class="ico">🔗</span> How to open it</h2>
+  <div class="flow">
+    <div class="st"><div class="big">💻</div><b>1. The demo PC is on</b>and the program is running (file <span class="en">avvia_ui.ps1</span>)</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🌐</div><b>2. Open the link</b>from any computer or phone, in a browser (Chrome, Edge, Safari…)</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔐</div><b>3. Enter username and password</b>in the small window that appears (ask whoever runs the demo)</div>
+  </div>
+  <p style="font-size:18px">Address: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a><br>
+    On the demo PC itself this also works: <a href="http://localhost:8000/">http://localhost:8000/</a></p>
+  <div class="tip"><b>💡</b> Nothing to install: a browser is enough. The site is password-protected and the data you upload stays on the demo PC.
+    The browser remembers the password until you close it.</div>
+</section>
+
+<!-- ================================================================ COLOURS -->
+<section id="colours">
+  <h2><span class="ico">🎨</span> The colours: one key for every chart</h2>
+  <p>Every chart always uses the same colours. Once you know them, you can read every page.</p>
+  <div class="colors">
+    <div class="col"><div class="sw"><i style="background:#e6e8ee"></i></div><div><b>White</b> – the real data the model was allowed to see.</div></div>
+    <div class="col"><div class="sw"><i style="background:#ff7a1a"></i></div><div><b>Orange</b> – the “test on the past”: a period the model did <b>not</b> see, forecast blind and then compared with reality.</div></div>
+    <div class="col"><div class="sw"><i style="background:#34d399"></i></div><div><b>Green</b> – the real future, which nobody knows yet.</div></div>
+    <div class="col"><div class="sw band"><i style="background:#34d399"></i></div><div><b>Coloured band</b> – the margin. “80%” means: <b>8 times out of 10</b> the real value falls inside the band.</div></div>
+    <div class="col"><div class="sw dash"><i></i></div><div><b>Grey or yellow dashed</b> – a “simple rule” (e.g. “same as last week”), for comparison.</div></div>
+    <div class="col"><div class="sw"><i style="background:#a78bfa"></i></div><div><b>Purple</b> – a scenario you made up (“what if we ran a promotion?”).</div></div>
+    <div class="col"><div class="sw dot"><i style="background:#f87171"></i></div><div><b>Red dot</b> – an unusual day, outside the normal range.</div></div>
+    <div class="col"><div class="sw"><i style="background:#60a5fa"></i></div><div><b>Blue</b> – background information: holidays, promotions, opening days…</div></div>
+  </div>
+  <div class="tip"><b>💡</b> Move the mouse (or your finger) over a chart and a small box shows the exact numbers for that day. Use the scroll wheel or drag to zoom in.</div>
+</section>
+
+<!-- ================================================================ BAR -->
+<section id="bar" class="page">
+  <h2><span class="ico">🎛️</span> The top bar (always visible)</h2>
+  <div class="purpose">It is the “remote control”: choose <b>which data</b> to look at, <b>which store</b> and <b>which version</b> of the model. It applies to every page.</div>
+  <figure class="shot" data-shot="barra"><img src="img/barra.png" alt="Top bar"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>The pages</b> (the tabs): Overview, Series, Total… Click to change page. The page you are on is orange. On the right, <span class="en">📘 Guida</span> opens this guide.</div></li>
+    <li data-n="2"><div><span class="en">Dataset</span> = <b>which collection of data</b>. There are public examples already (sales of 1,115 Rossmann stores, electricity use, bike rentals, temperatures…), and the data you upload appears here too.</div></li>
+    <li data-n="3"><div><span class="en">Store</span> / <span class="en">Series</span> = <b>which store</b> (or product, or city). It only appears when the data contains many of them.</div></li>
+    <li data-n="4"><div><b>Arrows ◀ ▶</b> = previous / next store, to flip through them one at a time.</div></li>
+    <li data-n="5"><div><span class="en">Model</span> = <b>which version of the “brain”</b>. The number (5M, 28M, 123M, 209M) is its size: bigger = usually more accurate but slower.
+      The words after the name say how it was used: <span class="en">no covariates</span> = without background information; <span class="en">closed = missing</span> = closed days treated as “empty”, not as “zero sales”.
+      Entries marked <span class="en">not computed</span> have not been calculated yet: choosing one starts the calculation.</div></li>
+    <li data-n="6"><div><span class="en">Horizon</span> = <b>how many days (or hours, or months) into the future</b> to forecast. Changing it redoes the calculations.</div></li>
+    <li data-n="7"><div><span class="en">Context</span> = <b>how much of the past the model reads</b> (0 = all of it). Usually there is no need to touch it.</div></li>
+    <li data-n="8"><div><b>Yellow pill ⏳</b> = a calculation is running in the background: it shows the percentage and the minutes left. Pages update by themselves when it finishes.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ OVERVIEW -->
+<section id="overview" class="page">
+  <h2><span class="ico">📊</span> Overview – “does the model work?”</h2>
+  <div class="purpose">The report card. For <b>every</b> store the last period was hidden, the model forecast it without seeing it, and then we checked how wrong it was. Here you find the overall grade and the comparison with simple methods.</div>
+  <p class="when"><b>When to use it:</b> first, to get the answer in 30 seconds.</p>
+  <h3>Top: the summary and the 6 key numbers</h3>
+  <figure class="shot" data-shot="overview_kpi"><img src="img/overview_kpi.png" alt="Summary and key numbers"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>The summary sentence</b>: which dates the model saw, which period was hidden (<span class="en">Holdout</span>), how far the future forecast goes and which version did best.</div></li>
+    <li data-n="2"><div><b>Notes</b> on how the data is handled (e.g. gaps in the data, closed days).</div></li>
+    <li data-n="3"><div><b>Average error</b> (<span class="en">MAPE</span>): how wrong it is on average, as a percentage. <b>9.98%</b> = on a day worth €1,000 it is off by about €100 on average.
+      Underneath, in green, how much better it is than the best simple rule.</div></li>
+    <li data-n="4"><div><b>A second way to measure error</b> (<span class="en">RMSPE</span>, the one used in the Kaggle competition): it punishes big mistakes more. Lower = better.</div></li>
+    <li data-n="5"><div><b>Error on total volume</b> (<span class="en">WAPE</span>): all the errors added up, divided by total sales. It is the “how wrong was I on turnover” view.</div></li>
+    <li data-n="6"><div><b>How reliable the band is</b> (<span class="en">Coverage of the 80% band</span>): how often the real value fell inside the band. It should be <b>close to 80%</b>:
+      much less = the model is over-confident; much more = it is too cautious.</div></li>
+    <li data-n="7"><div><b>Error on the total</b> (e.g. the whole chain): when all stores are added up, the errors partly cancel out, so it is lower.</div></li>
+    <li data-n="8"><div><b>Calculation time</b> on this ordinary PC, without a graphics card.</div></li>
+  </ol>
+  <h3>Middle: the leaderboard</h3>
+  <figure class="shot" data-shot="overview_classifica"><img src="img/overview_classifica.png" alt="Leaderboard"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>The winner</b> 🏆 (highlighted row). Orange rows are Timestral, the others are the simple rules.</div></li>
+    <li data-n="2"><div><b>A simple rule</b>, for example <span class="en">Mean weekday × promo</span> = “average of the same weekday, with or without a promotion”. They show whether the model adds value.</div></li>
+    <li data-n="3"><div><b>The columns</b> are different ways of measuring error: for almost all of them <b>lower = better</b>. Each one is explained in <a href="#words">Difficult words</a>.</div></li>
+    <li data-n="4"><div><b>Green number</b> = the best in that column.</div></li>
+    <li data-n="5"><div><b>Add to the comparison</b>: click a ▶ button to calculate another version of the model (e.g. the bigger 209M). It runs in the background; the yellow pill at the top shows progress.</div></li>
+  </ol>
+  <h3>Bottom: where it goes wrong</h3>
+  <figure class="shot" data-shot="overview_grafici"><img src="img/overview_grafici.png" alt="Analysis charts"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Error by step</b>: how wrong it is forecasting 1 day ahead, 2 days, … up to the last one. Usually, the further ahead, the bigger the error.</div></li>
+    <li data-n="2"><div><b>Distribution per store</b>: each bar counts how many stores have that error. The further left the orange “mountain” sits, the better.</div></li>
+    <li data-n="3"><div><b>Error by weekday</b>: for example, Sunday is harder.</div></li>
+    <li data-n="4"><div><b>Calibration</b>: checks whether the bands are honest. If the orange line sits on the dashed diagonal, “80%” really means 80%.</div></li>
+    <li data-n="5"><div><b>Error by group</b> (e.g. store type). Choose the grouping from the menu on the right.</div></li>
+    <li data-n="6"><div><b>Best and worst stores</b>. Click a row to open that store in the Series page.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ SERIES -->
+<section id="series" class="page">
+  <h2><span class="ico">🏪</span> Series – one store at a time</h2>
+  <div class="purpose">The chart of a single store: what happened, what the model had predicted and what it predicts for the future.</div>
+  <p class="when"><b>When to use it:</b> to show someone a concrete example (“look at store 1”). Change store with the ◀ ▶ arrows at the top.</p>
+  <figure class="shot" data-shot="serie"><img src="img/serie.png" alt="Series page"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Show baseline</span> = <b>show the simple rule</b> (grey dashed line) to compare it with the model.</div></li>
+    <li data-n="2"><div><span class="en">All</span> / <span class="en">Last year</span> = show <b>the whole history</b> or <b>only the last year</b>.</div></li>
+    <li data-n="3"><div><span class="en">Backtest + future</span> = <b>zoom on the interesting part</b>: the test on the past and the future (recommended view).</div></li>
+    <li data-n="4"><div><span class="en">Forecast CSV</span> = <b>download the forecast</b> as a file that opens in Excel (date, forecast value, low and high end of the band).</div></li>
+    <li data-n="5"><div><b>The labels</b>: store number, characteristics (type, assortment, distance to the nearest competitor…), error on this store and reliability of the band.</div></li>
+    <li data-n="6"><div><b>The key</b> to the chart colours. Click an entry to hide or show it.</div></li>
+    <li data-n="7"><div><b>Orange zone</b> = the period hidden from the model. White line = what really happened; orange line = what it had predicted. <b>The closer they are, the better.</b></div></li>
+    <li data-n="8"><div><b>Green zone</b> = the predicted future, with the dark band (8 times out of 10) and the lighter one (9 times out of 10).</div></li>
+    <li data-n="9"><div><b>Mini-map</b>: drag its edges to choose the period to look at.</div></li>
+  </ol>
+  <figure class="shot" data-shot="serie_covariate"><img src="img/serie_covariate.png" alt="Covariates and metrics"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>The background information</b> (<span class="en">Covariates</span>) given to the model: school holidays, public holidays, promotions, opening days… These are things <b>known in advance</b> (you already know when you will run a promo or close). Blue bars mark the “yes” days; faded ones are estimated.</div></li>
+    <li data-n="2"><div><b>This store’s report card</b>: the same measures as the Overview, just for this store.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ TOTAL -->
+<section id="total" class="page">
+  <h2><span class="ico">➕</span> Total – the whole chain together</h2>
+  <div class="purpose">The sum of all stores. It answers: “how much will we sell in total?”. It only appears when the data contains several stores.</div>
+  <figure class="shot" data-shot="totale"><img src="img/totale.png" alt="Total page"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Two ways to forecast the total</b>: <span class="en">bottom-up</span> (orange/green) = forecast every store and then add them up; <span class="en">direct</span> (purple dashed) = forecast the total directly.</div></li>
+    <li data-n="2"><div><b>Orange zone</b> = hidden period, to compare with reality (white line).</div></li>
+    <li data-n="3"><div><b>Leaderboard on the total</b>: who makes the smallest error on the chain total.</div></li>
+  </ol>
+  <div class="tip"><b>💡</b> In the Rossmann data, adding up the stores (5.6% error) works much better than forecasting the total directly: on Sundays almost every store is closed and the total “jumps”.</div>
+</section>
+
+<!-- ================================================================ EXPLORE -->
+<section id="explore" class="page">
+  <h2><span class="ico">⏪</span> Explore backtest – the time machine</h2>
+  <div class="purpose">Pick a day in the past and pretend it is “today”: everything after it <b>disappears</b> (from the chart too) and the model forecasts from there. Press ▶ and time moves forward, so you see the forecast change as new data arrives.</div>
+  <p class="when"><b>When to use it:</b> to show “live” how the model reasons. It is the most impressive page in a presentation.</p>
+  <figure class="shot" data-shot="esplora"><img src="img/esplora.png" alt="Explore backtest"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Frames</span> = <b>how many “todays”</b> to prepare (20, 40, 80). More frames = smoother movement, but a longer calculation.</div></li>
+    <li data-n="2"><div><span class="en">Look-back</span> = <b>how far back</b> the time travel starts (<span class="en">auto</span> is fine).</div></li>
+    <li data-n="3"><div><span class="en">Compute</span> = <b>prepare</b> the time machine (a few seconds). Press it once.</div></li>
+    <li data-n="4"><div><span class="en">Reveal hidden data</span> = <b>also show what really happened</b> after “today” (grey dotted line), to check.</div></li>
+    <li data-n="5"><div><span class="en">Follow “today”</span> = the chart <b>follows</b> the chosen day instead of showing the whole period.</div></li>
+    <li data-n="6"><div><span class="en">Speed</span> = <b>playback speed</b>.</div></li>
+    <li data-n="7"><div><b>▶ Play / ❚❚ Pause</b>: makes time move.</div></li>
+    <li data-n="8"><div><b>Slider</b>: drag it to choose the “today” yourself. The date is shown on the right.</div></li>
+    <li data-n="9"><div><b>Error for each “today”</b>: a tall bar = that time it was more wrong. Click a bar to jump to that day.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ LIVE -->
+<section id="live" class="page">
+  <h2><span class="ico">⚡</span> Live forecast – a forecast on the spot</h2>
+  <div class="purpose">Choose a store and a date: the model calculates straight away (a few seconds) what will happen next. If the date is in the past you also see what really happened and the score.</div>
+  <figure class="shot" data-shot="live"><img src="img/live.png" alt="Live forecast"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Forecast from</span> = <b>which day</b> to start from (empty = from the last available day, i.e. the real future).</div></li>
+    <li data-n="2"><div><span class="en">Forecast</span> = <b>calculate</b>.</div></li>
+    <li data-n="3"><div><span class="en">End of data</span> = <b>forecast the real future</b>, from the last existing data point.</div></li>
+    <li data-n="4"><div><span class="en">− 1 horizon</span> = <b>go back one period</b> (e.g. 48 days) and try again: handy for many tests in a row.</div></li>
+    <li data-n="5"><div><span class="en">Random date</span> = <b>a random date</b>: good for showing it isn’t “rigged” on a hand-picked day.</div></li>
+    <li data-n="6"><div><b>The result</b>: error against reality, reliability of the band and <span class="en">Bias</span> (+ = forecast too high, − = too low).</div></li>
+    <li data-n="7"><div><b>White dashed line</b> = the day the forecast starts from. On the right: green = forecast; grey dotted = what really happened.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ SPLIT -->
+<section id="split" class="page">
+  <h2><span class="ico">✂️</span> Split test – “here are 2 years, guess the other 3”</h2>
+  <div class="purpose">The toughest test. Take a stretch of history (e.g. 5 years), show the model only part of it (e.g. the first 2) and ask it to forecast all the rest. Then it is compared, year by year and month by month, with reality and with the simple rules.</div>
+  <p class="when"><b>When to use it:</b> to find out how far ahead you can trust it (1 month? 1 year? 3 years?). It works best with long data: try <span class="en">Germany electricity</span> or <span class="en">Melbourne temperature</span>, or your own.</p>
+  <figure class="shot" data-shot="split"><img src="img/split.png" alt="Split test"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Data from</span> = <b>where</b> the data to use starts.</div></li>
+    <li data-n="2"><div><span class="en">Model sees until</span> = <b>up to when the model may look</b>. Everything after this date is hidden.</div></li>
+    <li data-n="3"><div><span class="en">Forecast until</span> = <b>how far it must forecast</b>.</div></li>
+    <li data-n="4"><div><span class="en">Run split test</span> = <b>start</b> the test with the chosen dates.</div></li>
+    <li data-n="5"><div><b>Shortcuts</b>: <span class="en">5 years: 2 → 3</span> fills in the dates for you (5 years, 2 seen, 3 to forecast). There are also 1→1, 3→1 and 1 year → 3 months.</div></li>
+    <li data-n="6"><div><span class="en">Show best simple rule</span> = show/hide the <b>best simple rule</b> (yellow dotted line).</div></li>
+    <li data-n="7"><div><b>The summary</b>: how much it saw, how much it forecast, its error (red if a simple rule did better) and that of the best rule.</div></li>
+    <li data-n="8"><div><b>The cut line</b>: on the left (white) what the model saw, on the right the forecast (green) over reality (grey).</div></li>
+  </ol>
+  <figure class="shot" data-shot="split_analisi"><img src="img/split_analisi.png" alt="Split test analysis"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Error year by year</b>: does the orange bar (Timestral) grow as it moves away? Then the further ahead it looks, the less precise it is: that is normal.</div></li>
+    <li data-n="2"><div><b>“How the model did it”</b> in plain words: how much it saw, how much it had to forecast, how it widens the margin over time, and the final verdict.</div></li>
+    <li data-n="3"><div><b>The leaderboard</b> on the hidden period: who made the smallest error.</div></li>
+  </ol>
+  <figure class="shot" data-shot="split_tabella"><img src="img/split_tabella.png" alt="Month by month table"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Model error</b> month by month: green = under 5%, red = over 15%. “+” = it forecast more than reality, “−” = less.</div></li>
+    <li data-n="2"><div><b>Simple rule error</b> in the same month, for comparison.</div></li>
+  </ol>
+  <div class="warn"><b>⚠️</b> An honest result: with German electricity use (a very regular series), 3 years ahead the rule “same day last year” makes a smaller error (2.9%) than Timestral (4.6%). With temperatures and airline passengers Timestral wins. The test exists precisely to find this out on <b>your</b> data.</div>
+</section>
+
+<!-- ================================================================ WHAT-IF -->
+<section id="whatif" class="page">
+  <h2><span class="ico">🎚️</span> What-if – “what would happen if…?”</h2>
+  <div class="purpose">Change the information you know in advance (promotions, opening days, holidays, weather forecast) and immediately see how the forecast would change. Green = normal situation, purple = your scenario.</div>
+  <p class="when"><b>When to use it:</b> “if we run the promo every week, how much more do we sell?”, “if we close the first week, how much do we lose?”.</p>
+  <figure class="shot" data-shot="whatif"><img src="img/whatif.png" alt="What-if"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Ready-made scenarios</b>: one click and it runs (e.g. “promo every weekday”, “no promotions”, “closed the first week”).</div></li>
+    <li data-n="2"><div><b>What to do</b> with this information: <span class="en">keep</span> = leave it as it is; <span class="en">set to</span> = set a value; <span class="en">shift by</span> = add/subtract (e.g. +5 degrees); <span class="en">scale ×</span> = multiply (e.g. ×1.2 = +20%).</div></li>
+    <li data-n="3"><div><b>The value</b>: for yes/no, 1 = yes and 0 = no.</div></li>
+    <li data-n="4"><div><b>Which days</b>: from “step” to “step”, counting from the first forecast day (0 = the first day, 7 = one week later).</div></li>
+    <li data-n="5"><div><span class="en">Run scenario</span> = <b>calculate</b> the scenario with your choices.</div></li>
+    <li data-n="6"><div><span class="en">Reset</span> = <b>back to the normal situation</b>.</div></li>
+    <li data-n="7"><div><b>The result in numbers</b>: normal forecast total, total with the scenario and the difference (in value and in %).</div></li>
+    <li data-n="8"><div><b>Key</b>: green = base, purple = scenario. Under the chart you also see which information you changed.</div></li>
+  </ol>
+  <div class="tip"><b>💡</b> The model learns the effect of a promo from that store’s past: if promotions used to move sales very little, the scenario will move them very little too.</div>
+</section>
+
+<!-- ================================================================ ANOMALIES -->
+<section id="anomalies" class="page">
+  <h2><span class="ico">🚨</span> Anomalies – the strange days</h2>
+  <div class="purpose">The model redoes many small forecasts over the recent past and marks with a <b>red dot</b> every day that fell outside the band: breakdowns, storms, data errors, special events.</div>
+  <figure class="shot" data-shot="anomalie"><img src="img/anomalie.png" alt="Anomalies"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><span class="en">Window length</span> = <b>length of each small forecast</b> (e.g. 7 days).</div></li>
+    <li data-n="2"><div><span class="en">Windows</span> = <b>how many</b> to make going backwards (20 × 7 days = about 5 months checked).</div></li>
+    <li data-n="3"><div><span class="en">Band</span> = <b>how strict to be</b>. 98% = only flags things that are really out of the ordinary; 90% = more sensitive, flags more.</div></li>
+    <li data-n="4"><div><span class="en">Detect anomalies</span> = <b>start</b> the search.</div></li>
+    <li data-n="5"><div><b>The summary</b>: how many strange days, and the percentage outside the band compared with what is “normal by chance” (about 2% with the 98% band).</div></li>
+    <li data-n="6"><div><b>Red dot</b> = an anomalous day; the bigger it is, the stranger the day.</div></li>
+    <li data-n="7"><div><b>The list</b>, strangest first: date, real value, expected value, the band, and whether it was above ▲ or below ▼.</div></li>
+  </ol>
+</section>
+
+<!-- ================================================================ DATA -->
+<section id="data" class="page">
+  <h2><span class="ico">📤</span> Your data – trying it with our own numbers</h2>
+  <div class="purpose">Upload a file exported from Excel and the model analyses it just like the examples. <b>The file never leaves the demo PC.</b></div>
+  <h3>How to prepare the file (in Excel)</h3>
+  <div class="flow">
+    <div class="st"><div class="big">📅</div><b>One column with the date</b>e.g. 01/03/2024</div>
+    <div class="st"><div class="big">🏷️</div><b>(Optional) who it is</b>store, product, city… one row for each, for every day</div>
+    <div class="st"><div class="big">🔢</div><b>The number to forecast</b>sales, units, customers…</div>
+    <div class="st"><div class="big">➕</div><b>(Optional) extra information</b>promo yes/no, open yes/no, price…</div>
+    <div class="st"><div class="big">💾</div><b>Save as CSV</b>File → Save As → “CSV (Comma delimited)”</div>
+  </div>
+  <div class="tip"><b>💡</b> To try it right away there is a <b>made-up</b> sample file in the project folder: <span class="en">esempio_vendite_negozi.csv</span> (3 stores, 2 years, with promotions).
+    If you want the model to know about future promotions, add rows for the future days at the end with the promo filled in and the sales column <b>empty</b> (the sample already does this for 30 days).</div>
+  <figure class="shot" data-shot="dati"><img src="img/dati.png" alt="Your data"></figure>
+  <ol class="legend">
+    <li data-n="1"><div><b>Drag the file here</b> or click to choose it.</div></li>
+    <li data-n="2"><div><b>Preview</b>: the first rows, to check it is the right file.</div></li>
+    <li data-n="3"><div><span class="en">Name</span> = the <b>name</b> it will have in the Dataset menu.</div></li>
+    <li data-n="4"><div><span class="en">Date column</span> = <b>which column is the date</b> (it usually finds it by itself).</div></li>
+    <li data-n="5"><div><span class="en">Series ID column</span> = <b>which column says who the row belongs to</b> (store, product). Leave “single series” if the file has only one line of numbers.</div></li>
+    <li data-n="6"><div><span class="en">Forecast this</span> = <b>the number to forecast</b>.</div></li>
+    <li data-n="7"><div><b>The other columns</b>: <span class="en">ignore</span> = don’t use it; <span class="en">past only</span> = only known afterwards (e.g. customers who came in);
+      <span class="en">known in advance</span> = known beforehand (promo, opening days, list price). <span class="en">category</span> = it is a yes/no or a code, not a quantity.</div></li>
+    <li data-n="8"><div><span class="en">Frequency</span> = how often there is a data point (daily, weekly, monthly…). <span class="en">auto-detect</span> = it works it out by itself.</div></li>
+    <li data-n="9"><div><span class="en">Season / horizon</span> = length of the cycle (7 = a week for daily data) and how many steps to forecast. Leaving <span class="en">auto</span> is perfectly fine.</div></li>
+    <li data-n="10"><div><span class="en">Totals per period</span> = for monthly summaries: <b>sum</b> (sales, units) or <b>average</b> (prices, temperatures).</div></li>
+    <li data-n="11"><div><span class="en">Calendar features</span> = automatically adds weekday and month as known information. Leave it on.</div></li>
+    <li data-n="12"><div><span class="en">Public holidays</span> = adds the <b>public holidays</b> of the chosen country (IT = Italy).</div></li>
+    <li data-n="13"><div><span class="en">Load dataset</span> = <b>load it</b>. The Overview opens: the yellow pill shows the calculation in progress (seconds for a few stores, minutes for hundreds).</div></li>
+  </ol>
+  <div class="warn"><b>⚠️</b> Uploaded data stays in memory only while the program is running: if the PC restarts, it has to be uploaded again.</div>
+</section>
+
+<!-- ================================================================ PATHS -->
+<section id="paths" class="page">
+  <h2><span class="ico">🗺️</span> Guided paths: “I want to…”</h2>
+  <div class="path"><h3>✅ …find out in 2 minutes whether it works</h3><div class="steps">
+    <div class="s"><b>1</b> Dataset: <span class="en">Rossmann</span></div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Overview</span> page</div><div class="a">→</div>
+    <div class="s"><b>3</b> First card: average error and “x% better than…”</div><div class="a">→</div>
+    <div class="s"><b>4</b> Fourth card: is the reliability close to 80%?</div><div class="a">→</div>
+    <div class="s"><b>5</b> Leaderboard: is Timestral at the top?</div></div></div>
+  <div class="path"><h3>🏪 …show a store to a colleague</h3><div class="steps">
+    <div class="s"><b>1</b> <span class="en">Overview</span> → “Best and worst” table</div><div class="a">→</div>
+    <div class="s"><b>2</b> Click a store</div><div class="a">→</div>
+    <div class="s"><b>3</b> <span class="en">Series</span> opens: orange vs white = test on the past</div><div class="a">→</div>
+    <div class="s"><b>4</b> Green = future; <span class="en">Forecast CSV</span> for Excel</div></div></div>
+  <div class="path"><h3>🎬 …give a “live” demonstration</h3><div class="steps">
+    <div class="s"><b>1</b> <span class="en">Explore backtest</span> page</div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Compute</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Tick <span class="en">Reveal hidden data</span></div><div class="a">→</div>
+    <div class="s"><b>4</b> ▶ and explain: “this is what it knew that day, this is what it predicted”</div></div></div>
+  <div class="path"><h3>✂️ …run the “2 years seen, 3 to guess” test</h3><div class="steps">
+    <div class="s"><b>1</b> A dataset with many years (e.g. <span class="en">Germany electricity</span> or yours)</div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Split test</span> page</div><div class="a">→</div>
+    <div class="s"><b>3</b> <span class="en">5 years: 2 → 3</span> button</div><div class="a">→</div>
+    <div class="s"><b>4</b> Read “How the model did it” and the month-by-month table</div></div></div>
+  <div class="path"><h3>🏷️ …find out what a promotion is worth</h3><div class="steps">
+    <div class="s"><b>1</b> Choose the store at the top</div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">What-if</span> page</div><div class="a">→</div>
+    <div class="s"><b>3</b> Ready scenario “Promo every weekday” (or set Promo = 1 on some days yourself)</div><div class="a">→</div>
+    <div class="s"><b>4</b> Read “Difference”: how much more than normal</div></div></div>
+  <div class="path"><h3>📤 …try it with our own data</h3><div class="steps">
+    <div class="s"><b>1</b> Excel → save as CSV</div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Your data</span> page → drag the file in</div><div class="a">→</div>
+    <div class="s"><b>3</b> Check the date, “who it is”, the number to forecast</div><div class="a">→</div>
+    <div class="s"><b>4</b> Promos/opening days = <span class="en">known in advance</span></div><div class="a">→</div>
+    <div class="s"><b>5</b> <span class="en">Load dataset</span> and wait for the yellow pill</div></div></div>
+  <div class="path"><h3>🚨 …find unusual days</h3><div class="steps">
+    <div class="s"><b>1</b> <span class="en">Anomalies</span> page</div><div class="a">→</div>
+    <div class="s"><b>2</b> <span class="en">Detect anomalies</span></div><div class="a">→</div>
+    <div class="s"><b>3</b> Look at the red dots and the list: what happened that day?</div></div></div>
+</section>
+
+<!-- ================================================================ WORDS -->
+<section id="words" class="page">
+  <h2><span class="ico">📖</span> Difficult words, explained simply</h2>
+  <table class="gl">
+    <tr><td>Forecast</td><td>A prediction of future numbers.</td></tr>
+    <tr><td>Holdout / backtest</td><td>The period <b>hidden</b> from the model to test it – like a school test where the teacher already knows the answers.</td></tr>
+    <tr><td>Baseline</td><td>A simple rule used as a yardstick (e.g. “same as last week”, “same day last year”).</td></tr>
+    <tr><td>MAPE</td><td>Average error as a percentage, day by day. 10% = on average it is off by a tenth. <b>Lower = better.</b></td></tr>
+    <tr><td>WAPE</td><td>Error on total volume: how wrong I was overall compared with how much I sold overall. Lower = better.</td></tr>
+    <tr><td>RMSPE</td><td>Like MAPE but weighs big mistakes more (it is the measure of the Kaggle Rossmann competition).</td></tr>
+    <tr><td>sMAPE</td><td>A “symmetric” version of MAPE. Lower = better.</td></tr>
+    <tr><td>MASE</td><td>Comparison with the rule “repeat the last cycle”: <b>below 1 = better than the rule</b>, above 1 = worse.</td></tr>
+    <tr><td>MAE / RMSE</td><td>Average error in the units of the data (e.g. euros per day). RMSE weighs big mistakes more.</td></tr>
+    <tr><td>Bias</td><td>Tendency: <b>+</b> = always forecasts a bit too much; <b>−</b> = always a bit too little. Close to 0 = balanced.</td></tr>
+    <tr><td>Coverage 80% (Cov. 80%)</td><td>How often the real value fell inside the band. Ideal ≈ 80%.</td></tr>
+    <tr><td>Width 80%</td><td>How wide the band is compared with the values: narrow = precise, wide = cautious.</td></tr>
+    <tr><td>WQL</td><td>A grade for the whole band, not just the middle line. Lower = better.</td></tr>
+    <tr><td>Covariates</td><td>Background information given to the model: promos, opening days, holidays, weather…</td></tr>
+    <tr><td>Known in advance</td><td>Information known beforehand (the promo calendar, planned closures).</td></tr>
+    <tr><td>Past only</td><td>Information only known afterwards (e.g. customers who came in yesterday).</td></tr>
+    <tr><td>Closed = missing / = 0</td><td>How to treat closed days: as “empty” (recommended) or as “zero sales”.</td></tr>
+    <tr><td>Bottom-up / direct</td><td>Total obtained by adding up the forecasts of each store / by forecasting the total directly.</td></tr>
+    <tr><td>Horizon</td><td>How far ahead to forecast.</td></tr>
+    <tr><td>Context</td><td>How much of the past the model reads.</td></tr>
+    <tr><td>Zero-shot</td><td>The model is not “trained” on your data: it reads it and forecasts straight away, like an expert seeing a chart for the first time.</td></tr>
+    <tr><td>5M · 28M · 123M · 209M</td><td>Size of the model (millions of “parameters”). Bigger = usually more accurate, but slower.</td></tr>
+  </table>
+</section>
+
+<!-- ================================================================ PROBLEMS -->
+<section id="problems" class="page">
+  <h2><span class="ico">🛟</span> If something goes wrong</h2>
+  <table class="gl">
+    <tr><td>The page doesn’t open</td><td>Is the demo PC on and the program running? On the demo PC, run <span class="en">avvia_ui.ps1</span>.</td></tr>
+    <tr><td>It asks for a username and password</td><td>That is normal: the site is protected. If the password is rejected, ask again whoever runs the demo (it is in the file <span class="en">accesso_demo.json</span> on the demo PC).</td></tr>
+    <tr><td>“Timestral is evaluating…”</td><td>It is the first calculation for that data: wait, the yellow pill at the top shows the minutes left. Afterwards it is saved and the next time is instant.</td></tr>
+    <tr><td>A button does nothing</td><td>Check whether a red box with an error message appears at the bottom right; it often says what to fix (e.g. “too many steps”).</td></tr>
+    <tr><td>The 209M model is very slow</td><td>That is normal on this PC without a graphics card: for 1,115 stores it takes about 20–25 minutes. For tests, use 28M.</td></tr>
+    <tr><td>My file isn’t read properly</td><td>Check there is a single header row, the date in a single column and numbers without symbols (no “€”).</td></tr>
+    <tr><td>My data has disappeared</td><td>After the program restarts, uploaded files must be uploaded again (by design: they are not saved to disk).</td></tr>
+  </table>
+  <div class="tip"><b>💡</b> Licence: the model is free for testing and for companies under 20 million dollars of revenue per month; above that threshold a commercial licence from Mistral is required.</div>
+  <p class="noprint" style="margin-top:18px"><a href="/">← Back to the application</a> · <a href="#" onclick="window.print();return false;">🖨️ Print / save as PDF</a> · <a href="index.html">🇮🇹 Versione italiana</a></p>
+</section>
+</div>
+<a class="top noprint" href="#">↑ Contents</a>
+
+<script>
+// place the numbers on the screenshots (coordinates computed by tools/make_manual_shots.py)
+fetch("shots.json").then((r) => r.json()).then((shots) => {
+  document.querySelectorAll("figure.shot").forEach((fig) => {
+    const s = shots[fig.dataset.shot];
+    if (!s) return;
+    s.markers.forEach((m) => {
+      const el = document.createElement("span");
+      el.className = "mk"; el.textContent = m.n;
+      el.style.left = m.x + "%"; el.style.top = m.y + "%";
+      fig.appendChild(el);
+    });
+  });
+});
+</script>
+</body>
+</html>

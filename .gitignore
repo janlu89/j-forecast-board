@@ -1,0 +1,47 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Tool caches and reports
+.pytest_cache/
+.ruff_cache/
+.import_linter_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Runtime data: never committed (downloaded datasets, caches, uploads, diagnostics)
+data/
+results/
+output/
+uploads/
+diagnostics/
+*.npz
+!tests/golden/fixtures/**/*.npz
+
+# Secrets and per-install settings of the original demo
+accesso_demo.json
+agents_config.json
+agents_config.tmp
+.env
+.env.*
+*.key
+bundle*.zip
+
+# Internal working plan (mentions the owner's machines and employer): kept on disk, never published
+docs/ROADMAP.md
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timestral demo</title>
+<!-- Served under a path prefix (e.g. /timestral via Tailscale Funnel): relative URLs need a trailing slash. -->
+<script>if (!location.pathname.endsWith("/")) location.replace(location.pathname + "/" + location.search + location.hash);</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230b0d12'/%3E%3Cpath d='M2 11 L6 7 L9 9 L14 3' stroke='%23ff7a1a' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="static/style.css">
+<script src="static/vendor/plotly.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand"><span class="m" id="brandModel">Timestral</span><span class="x">×</span><span id="brandData">…</span></div>
+    <nav id="nav">
+      <button data-tab="overview" class="active">Overview</button>
+      <button data-tab="series">Series</button>
+      <button data-tab="total">Total</button>
+      <button data-tab="explore">Explore backtest</button>
+      <button data-tab="live">Live forecast</button>
+      <button data-tab="split">Split test</button>
+      <button data-tab="whatif">What-if</button>
+      <button data-tab="anomalies">Anomalies</button>
+      <button data-tab="planner">Order planner</button>
+      <button data-tab="upload">Your data</button>
+      <button data-tab="about">About</button>
+      <a class="navlink" href="static/manual/index.html" target="_blank" title="Guida pratica in italiano">📘 Guida</a>
+      <a class="navlink" href="static/manual/en.html" target="_blank" title="Practical guide in English">📘 Guide (EN)</a>
+    </nav>
+  </div>
+  <div class="controls">
+    <label>Dataset <select id="dsSel"></select></label>
+    <span id="serCtl" class="serctl"><label><span id="serLabel">Series</span> <select id="serSel"></select></label>
+      <button id="serPrev" title="previous">◀</button><button id="serNext" title="next">▶</button></span>
+    <label>Model <select id="varSel"></select></label>
+    <label title="Forecast horizon (steps). Changing it re-runs the evaluation.">Horizon <input type="number" id="horizon" min="1" max="2000"></label>
+    <label title="How many past points the model reads (0 = all)">Context <input type="number" id="context" min="0" step="64"></label>
+    <span id="jobPill" class="pill" hidden></span>
+  </div>
+</header>
+
+<main>
+<!-- ======================================================= OVERVIEW -->
+<section class="tab active" id="tab-overview">
+  <div class="desc"><b>Overview – how good is the model?</b> Every series is cut before its last period (the <b>holdout</b>),
+    forecast <b>blind</b> by Timestral and by classic methods, and scored against what really happened. Headline numbers on top,
+    full leaderboard below, then where the errors come from.</div>
+  <div id="ovOut" class="card"><div class="empty">Loading…</div></div>
+</section>
+
+<!-- ======================================================= SERIES -->
+<section class="tab" id="tab-series">
+  <div class="desc"><b>Series.</b> One series at a time (use ◀ ▶ in the bar above). White = data the model saw; <span style="color:var(--orange)">orange</span> =
+    holdout forecast vs reality; <span style="color:var(--green)">green</span> = real future forecast with 80% (and lighter 90%) band.
+    Underneath: the covariates known in advance that were given to the model.</div>
+  <div class="tool">
+    <label><input type="checkbox" id="seBaseline"> Show baseline</label>
+    <span class="sep"></span>
+    <button class="seg" data-view="all">All</button>
+    <button class="seg" data-view="year">Last year</button>
+    <button class="seg active" data-view="recent">Backtest + future</button>
+    <span class="sep"></span>
+    <button id="seCsv">⬇ Forecast CSV</button>
+  </div>
+  <div class="chips" id="seChips"></div>
+  <div class="card" id="seCard"><div id="sePlot" class="plot" style="height:500px"></div></div>
+  <div class="card" id="covCard"><h3>Covariates</h3><div class="sub" id="covSub"></div><div id="covPlot" class="plot"></div></div>
+  <div class="card"><h3>Metrics for this series on the holdout</h3><div id="seTable"></div></div>
+</section>
+
+<!-- ======================================================= TOTAL -->
+<section class="tab" id="tab-total">
+  <div class="desc"><b>Total.</b> The sum of all series (e.g. the whole chain). <b>Bottom-up</b> = sum of the per-series forecasts;
+    <b>direct</b> = Timestral applied to the aggregated total. Errors partly cancel out when summing, so the total is usually much easier to forecast.</div>
+  <div class="chips" id="toChips"></div>
+  <div class="card" id="toCard"><div id="toPlot" class="plot" style="height:480px"></div></div>
+  <div class="card"><h3>Metrics on the total</h3><div id="toTable"></div></div>
+</section>
+
+<!-- ======================================================= EXPLORE -->
+<section class="tab" id="tab-explore">
+  <div class="desc"><b>Explore the backtest.</b> Move the slider to pick a “today”: everything after it is <b>hidden from the model and from the chart</b>,
+    and Timestral forecasts from there. Press ▶ to travel through time and watch the prediction adapt as data arrives.
+    Turn on <i>Reveal hidden data</i> to compare with what really happened.</div>
+  <div class="tool">
+    <label>Frames <select id="rpFrames"><option>20</option><option selected>40</option><option>80</option></select></label>
+    <label>Look-back <select id="rpSpan"><option value="0" selected>auto</option><option value="2">2× horizon</option><option value="4">4× horizon</option><option value="8">8× horizon</option><option value="16">16× horizon</option></select></label>
+    <button class="primary" id="rpRun">Compute</button>
+    <span class="sep"></span>
+    <label><input type="checkbox" id="rpReveal"> Reveal hidden data</label>
+    <label><input type="checkbox" id="rpFollow" checked> Follow “today”</label>
+    <label>Speed <select id="rpSpeed"><option value="900">slow</option><option value="450" selected>normal</option><option value="180">fast</option></select></label>
+  </div>
+  <div class="chips" id="rpChips"></div>
+  <div class="card" id="rpCard">
+    <div id="rpPlot" class="plot" style="height:470px"><div class="empty">Press <b>Compute</b> to start.</div></div>
+    <div class="slider"><button id="rpPlay" title="Play / pause">▶</button>
+      <input type="range" id="rpSlider" min="0" max="0" value="0" disabled><span class="when" id="rpWhen">—</span></div>
+  </div>
+  <div class="card"><h3>Error at each “today”</h3><div class="sub">Error of each frame’s forecast against the hidden data (the last frames have little or no truth yet). Click a bar to jump.</div>
+    <div id="rpErr" class="plot" style="height:200px"></div></div>
+</section>
+
+<!-- ======================================================= LIVE -->
+<section class="tab" id="tab-live">
+  <div class="desc"><b>Live forecast.</b> Pick a series, a date to forecast from and a horizon: Timestral predicts on the spot (a few seconds on CPU).
+    If the chosen date is in the past, the real values are shown and scored; at the end of the data it is a true forecast of the future.</div>
+  <div class="tool">
+    <label>Forecast from <input type="date" id="lvDate"></label>
+    <button class="primary" id="lvRun">Forecast</button>
+    <span class="sep"></span>
+    <button id="lvEnd">End of data</button><button id="lvBack">− 1 horizon</button><button id="lvRand">Random date</button>
+  </div>
+  <div class="chips" id="lvChips"></div>
+  <div class="card" id="lvCard"><div id="lvPlot" class="plot" style="height:470px"><div class="empty">Press <b>Forecast</b>.</div></div></div>
+</section>
+
+<!-- ======================================================= SPLIT TEST -->
+<section class="tab" id="tab-split">
+  <div class="desc"><b>Split test – give the model only part of the history.</b> Choose where the data starts, up to when Timestral may look,
+    and how far it must forecast. Everything after the split is <b>hidden from the model</b>; then the forecast is compared with what really
+    happened, period by period, against simple rules that see exactly the same data.
+    Example: <i>5 years of data → give 2 years → forecast the other 3</i>.</div>
+  <div class="tool">
+    <label>Data from <input type="date" id="spStart"></label>
+    <label>Model sees until <input type="date" id="spSplit"></label>
+    <label>Forecast until <input type="date" id="spEnd"></label>
+    <button class="primary" id="spRun">Run split test</button>
+    <span class="sep"></span>
+    <span class="note">Presets (end of data):</span>
+    <button data-sp="2,3">5 years: 2 → 3</button><button data-sp="1,1">1 → 1 year</button><button data-sp="3,1">3 → 1 year</button><button data-sp="1,0.25">1 year → 3 months</button>
+    <span class="sep"></span><label><input type="checkbox" id="spBase" checked> Show best simple rule</label>
+  </div>
+  <div class="chips" id="spChips"></div>
+  <div class="card" id="spCard"><div id="spPlot" class="plot" style="height:480px"><div class="empty">Pick a preset (e.g. <b>5 years: 2 → 3</b>) or set the dates and press <b>Run split test</b>.</div></div></div>
+  <div class="grid3">
+    <div class="card"><h3>Error by period</h3><div class="sub">Does the forecast get worse the further it goes from the data it saw?</div><div id="spPer" class="plot" style="height:300px"></div></div>
+    <div class="card"><h3>How the model did it</h3><div id="spHow" class="prose" style="font-size:13.5px"></div></div>
+  </div>
+  <div class="card"><h3>Leaderboard on the hidden period</h3><div id="spLb"></div></div>
+  <div class="card"><h3>Period by period</h3><div class="sub" id="spTabSub"></div><div class="scroll" id="spTable" style="max-height:420px"></div></div>
+</section>
+
+<!-- ======================================================= WHAT-IF -->
+<section class="tab" id="tab-whatif">
+  <div class="desc"><b>What-if scenarios.</b> Covariates <i>known in advance</i> (opening days, promotions, holidays, weather forecast…)
+    can be edited for the future of the selected series. Compare the <span style="color:var(--green)">base forecast</span> with the
+    <span style="color:var(--purple)">scenario</span>. Steps are counted from the first forecast point (step 0).</div>
+  <div class="card" id="wiCard"><h3>Scenario</h3><div class="presets" id="wiPresets"></div><div id="wiRows"></div>
+    <div class="tool" style="margin:10px 0 0"><button class="primary" id="wiRun">Run scenario</button><button id="wiReset">Reset</button></div></div>
+  <div class="chips" id="wiChips"></div>
+  <div class="card" id="wiPlotCard"><div id="wiPlot" class="plot" style="height:430px"></div></div>
+  <div class="card"><h3>Covariates: base vs scenario</h3><div id="wiCov" class="plot"></div></div>
+</section>
+
+<!-- ======================================================= ANOMALIES -->
+<section class="tab" id="tab-anomalies">
+  <div class="desc"><b>Anomaly detection.</b> Short forecasts are replayed over the recent past of the selected series and every point
+    <b>outside the model’s uncertainty band</b> is flagged. With a 98% band about 2% of points fall outside by chance;
+    many more means unusual events (outages, storms, data errors, special promotions…).</div>
+  <div class="tool">
+    <label>Window length <input type="number" id="adStep" min="1"></label>
+    <label>Windows <input type="number" id="adWin" value="20" min="1" max="200"></label>
+    <label>Band <select id="adLevel"><option value="0.9">90%</option><option value="0.98" selected>98%</option></select></label>
+    <button class="primary" id="adRun">Detect anomalies</button>
+  </div>
+  <div class="chips" id="adChips"></div>
+  <div class="card" id="adCard"><div id="adPlot" class="plot" style="height:430px"><div class="empty">Press <b>Detect anomalies</b>.</div></div></div>
+  <div class="card"><h3>Flagged points</h3><div class="scroll" id="adTable"></div></div>
+</section>
+
+<!-- ======================================================= ORDER PLANNER -->
+<section class="tab" id="tab-planner">
+  <div class="desc"><b>Order planner – from forecast to decision.</b> A forecast is only useful if it changes what you order.
+    Timestral gives a whole range (quantiles), so you can order e.g. the <b>P90</b> instead of “forecast + 20% buffer”.
+    Scored on the same hidden period as the Overview: units you could not sell (<span style="color:var(--red)">lost sales</span>)
+    vs units left on the shelf (<span style="color:var(--blue)">leftover stock</span>). Instant: it reuses the cached backtest.</div>
+  <div class="tool">
+    <label>Target availability <select id="plTarget"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.98">98%</option></select></label>
+    <label title="Margin lost on each missed sale, as % of its value">Lost margin <input type="number" id="plMargin" value="40" min="1" max="1000" step="5">%</label>
+    <label title="Cost of each leftover unit (holding, markdown, waste), as % of its value">Leftover cost <input type="number" id="plHold" value="15" min="0" max="1000" step="5">%</label>
+    <label>Scope <select id="plScope"><option value="all">All series</option><option value="series">Selected series</option></select></label>
+    <button class="primary" id="plRun">Update</button>
+  </div>
+  <div class="chips" id="plChips"></div>
+  <div id="plKpis"></div>
+  <div class="grid2">
+    <div class="card" id="plCard"><h3>Availability vs leftover stock</h3>
+      <div class="sub">Each point is a stocking policy. Lower-right is better: more demand served with less stock left over.</div>
+      <div id="plCurve" class="plot" style="height:380px"></div></div>
+    <div class="card"><h3>What to order next · <span id="plSer"></span></h3>
+      <div class="sub" id="plPlanSub"></div><div id="plPlan" class="plot" style="height:380px"></div></div>
+  </div>
+  <div class="card"><h3>Cost on the hidden period</h3><div class="sub" id="plTabSub"></div><div id="plTable"></div></div>
+</section>
+
+<!-- ======================================================= UPLOAD -->
+<section class="tab" id="tab-upload">
+  <div class="desc"><b>Your data.</b> Load a CSV export (Excel “;” and European decimals are fine). <b>Nothing leaves this PC</b>.
+    One file can hold <b>many series</b> (e.g. one row per store and day): pick the column that identifies the series.
+    Tip: to use <i>planned</i> future values (promotions, opening days, prices), add future rows with those columns filled and the target empty.</div>
+  <div class="card" id="upCard">
+    <label class="drop" id="drop"><input type="file" id="upFile" accept=".csv,.txt" hidden>
+      <b>Click or drop a CSV file here</b><br><span class="note">one date column + at least one numeric column</span></label>
+    <div id="upForm"></div>
+  </div>
+</section>
+
+<!-- ======================================================= ABOUT -->
+<section class="tab" id="tab-about"><div class="card prose" id="aboutBody"></div></section>
+</main>
+<!-- ======================================================= CHAT (side panel, available on every tab) -->
+<button id="chatFab" class="chatfab" type="button" aria-controls="chatDrawer" aria-expanded="false">💬 Ask about this page</button>
+<aside id="chatDrawer" class="drawer" hidden aria-label="Ask about this page">
+  <div class="drawer-hd">
+    <div><div class="drawer-title">💬 Ask about this page</div><div class="note" id="chatCtx"></div></div>
+    <div class="drawer-actions">
+      <button type="button" id="agentBtn" class="agentbtn" title="Choose and configure the AI agent" aria-haspopup="dialog">
+        <span class="dot" id="agentDot"></span><span id="agentName">Claude</span> <span aria-hidden="true">⚙</span></button>
+      <button type="button" id="chatClose" class="iconbtn" title="Close" aria-label="Close">✕</button>
+    </div>
+  </div>
+  <div id="chatLog" class="chatlog" aria-live="polite"></div>
+  <div class="chatsuggest" id="chatSuggest"></div>
+  <form id="chatForm" class="chatform">
+    <textarea id="chatIn" rows="2" placeholder="Ask about what you see, e.g. “Explain these numbers”" maxlength="2000" aria-label="Your question"></textarea>
+    <button class="primary" id="chatSend" type="submit">Send</button>
+  </form>
+  <div class="note">The agent sees this page (numbers, tables, chart data) and can run the demo’s forecasting tools. English answers, one question at a time.</div>
+</aside>
+<dialog id="agentModal" class="modal" aria-labelledby="agentTitle">
+  <form method="dialog" id="agentForm">
+    <div class="modal-hd"><h3 id="agentTitle">AI agent for the chat</h3>
+      <button type="button" class="iconbtn" id="agentX" aria-label="Close">✕</button></div>
+    <p class="note">Choose who answers in “Ask about this page”. Every agent gets the same page context and the same forecasting tools.
+      API keys are stored only on the demo PC and are never sent back to the browser.</p>
+    <div id="agentList" class="agentlist" role="radiogroup" aria-label="Agent"></div>
+    <div class="modal-ft"><span class="note" id="agentMsg" role="status"></span>
+      <button type="button" id="agentCancel">Cancel</button><button type="submit" class="primary" id="agentSave">Use this agent</button></div>
+  </form>
+</dialog>
+<div id="toast"></div>
+<script src="static/app.js"></script>
+</body>
+</html>
