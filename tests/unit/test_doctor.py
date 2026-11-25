@@ -108,3 +108,20 @@ def test_synthetic_csv_has_three_stores_and_a_promo_flag():
 def test_only_the_session_cookie_is_kept():
     assert app_probe._session_cookie("jfb_session=1.abc; HttpOnly; Path=/") == "jfb_session=1.abc"
     assert app_probe._session_cookie("other=1; HttpOnly") == ""
+
+
+def test_a_launcher_that_says_the_cli_is_missing_counts_as_not_installed(monkeypatch):
+    # VS Code puts a 'copilot' shim on PATH that only prints how to install the real CLI
+    from j_forecast_board.doctor import environment
+
+    shim = "GitHub Copilot CLI was not found. Run copilot in a terminal to install it."
+    monkeypatch.setattr(environment.shutil, "which", lambda name: "C:/VS Code/bin/copilot.EXE")
+    monkeypatch.setattr(
+        environment.subprocess,
+        "run",
+        lambda *a, **k: environment.subprocess.CompletedProcess(a, 1, stdout=shim, stderr=""),
+    )
+    check = environment._cli("copilot")
+    assert check.status == OK
+    assert check.message == "copilot: not installed (optional; only a launcher is on PATH)"
+    assert check.details == {"found": False, "launcher": "C:/VS Code/bin/copilot.EXE"}

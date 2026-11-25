@@ -234,4 +234,7 @@ def _cli(name: str) -> Check:
         version = (result.stdout or result.stderr).strip().splitlines()[0][:80]
     except (OSError, subprocess.TimeoutExpired, IndexError) as error:
         version = f"version unknown ({type(error).__name__})"
+    if "not found" in version.lower() or "not installed" in version.lower():
+        message = f"{name}: not installed (optional; only a launcher is on PATH)"
+        return Check("", "", OK, message, details=dict(found=False, launcher=executable))
     return Check("", "", OK, f"{name}: {version}", details=dict(found=True, path=executable))
