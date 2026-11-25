@@ -21,10 +21,11 @@ from pathlib import Path
 from . import agents as AG
 from . import auth as A
 from . import openai_agent as OA
+from . import settings
 
 CLAUDE = os.environ.get("TIMESTRAL_CHAT_CLI") or shutil.which("claude") or str(Path.home() / ".local/bin/claude")
 MODEL = os.environ.get("TIMESTRAL_CHAT_MODEL", "opus")
-TIMEOUT = int(os.environ.get("TIMESTRAL_CHAT_TIMEOUT", "240"))
+TIMEOUT = settings.current().chat_timeout
 MCP_SERVER = Path(__file__).with_name("mcp_forecaster.py")
 _LOCK = asyncio.Lock()
 

@@ -1,6 +1,6 @@
 """Chat agents: which AI answers in the 'Ask about this page' panel, and its settings.
 
-Stored on the demo PC in ../agents_config.json (permissions 600). API keys are never sent back to the browser:
+Stored in secrets/agents.json under JFB_HOME (permissions 600). API keys are never sent back to the browser:
 the API only reports whether a key is set and its last 4 characters.
 Kinds:
   claude-cli  Claude Code CLI on this PC (subscription login, no API key)       -> chat.py
@@ -18,11 +18,12 @@ import threading
 import urllib.error
 import urllib.parse
 import urllib.request
-from pathlib import Path
 
-CONFIG = Path(os.environ.get("JFB_HOME") or Path(__file__).resolve().parents[2]) / "agents_config.json"
+from . import paths
+
+CONFIG = paths.current().agent_settings
 # Some APIs sit behind Cloudflare, which rejects the default "Python-urllib" User-Agent (Groq: HTTP 403, error 1010).
-USER_AGENT = "timestral-demo/1.0"
+USER_AGENT = "j-forecast-board/0.1"
 _lock = threading.Lock()
 
 CLAUDE_MODELS = ["opus", "sonnet", "haiku", "fable"]

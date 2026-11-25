@@ -1,29 +1,25 @@
 """Datasets for the Timestral web demo.
 
 A dataset is a *panel*: N series on a common date grid (N = 1 for single series).
-Public datasets are downloaded once and cached in ../data.
+Public datasets are downloaded once and cached in the data folder of JFB_HOME.
 """
 
 from __future__ import annotations
 
 import io
-import os
 import threading
 import time
 import urllib.request
 import uuid
 import zipfile
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]  # the source checkout
-# Folder for runtime files (datasets, results, credentials, agent settings). JFB_HOME moves it, e.g. for tests.
-HOME = Path(os.environ.get("JFB_HOME") or ROOT)
-DATA_DIR = HOME / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+from . import paths, settings
+
+DATA_DIR = paths.current().data
 
 
 @dataclass
@@ -105,6 +101,8 @@ def download(url: str, fname: str) -> bytes:
     path = DATA_DIR / fname
     if path.exists():
         return path.read_bytes()
+    if settings.current().offline:
+        raise RuntimeError(f"Offline mode (JFB_OFFLINE=1): {fname} has not been downloaded yet.")
     path.parent.mkdir(parents=True, exist_ok=True)
     last = None
     for _ in range(5):

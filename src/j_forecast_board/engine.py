@@ -9,6 +9,7 @@ import warnings
 
 import numpy as np
 
+from . import settings
 from .data import Dataset, known_extended
 
 warnings.filterwarnings("ignore")
@@ -53,7 +54,9 @@ def get_model(repo: str):
         m, last = None, None
         try:
             m = TimestralForecaster.from_pretrained(repo, device="cpu", local_files_only=True)
-        except Exception:
+        except Exception as e:
+            if settings.current().offline:
+                raise RuntimeError(f"Offline mode (JFB_OFFLINE=1): {repo} is not in the local cache.") from e
             for _ in range(10):  # the connection to huggingface.co is flaky on this network
                 try:
                     m = TimestralForecaster.from_pretrained(repo, device="cpu")

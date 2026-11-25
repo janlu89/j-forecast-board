@@ -23,7 +23,8 @@ shutil.copytree(FIXTURES, SCRATCH_HOME, dirs_exist_ok=True)
 
 TEST_USER = "tester"
 TEST_PASSWORD = secrets.token_urlsafe(16)
-(SCRATCH_HOME / "accesso_demo.json").write_text(
+(SCRATCH_HOME / "secrets").mkdir()
+(SCRATCH_HOME / "secrets" / "credentials.json").write_text(
     json.dumps({"utente": TEST_USER, "password": TEST_PASSWORD}), encoding="utf-8"
 )
 

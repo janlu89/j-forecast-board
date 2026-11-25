@@ -2,7 +2,8 @@
 
 A login page sets a signed session cookie; HTTP Basic auth is still accepted (curl, scripts).
 In-app browsers (mobile apps, chat clients) often never show the Basic-auth popup, hence the page.
-Credentials live in ../accesso_demo.json (created on first start with a random password).
+Credentials live in secrets/credentials.json under JFB_HOME (created on first start with a random
+password, printed once). JFB_AUTH=off disables the login, only on this PC (see settings.py).
 The app may be served under a path prefix (e.g. /timestral), so every URL produced here is relative.
 """
 
@@ -18,13 +19,14 @@ import os
 import re
 import secrets
 import time
-from pathlib import Path
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 
-CREDENTIALS = os.path.join(os.environ.get("JFB_HOME") or str(Path(__file__).resolve().parents[2]), "accesso_demo.json")
-COOKIE = "timestral_session"
+from . import paths, settings
+
+CREDENTIALS = paths.current().credentials
+COOKIE = "jfb_session"
 SESSION_DAYS = 30
 # Random per process: lets local helpers (the chat's tool server) call the API without the password.
 INTERNAL_TOKEN = secrets.token_urlsafe(32)
@@ -33,9 +35,12 @@ _NEXT_OK = re.compile(r"^[A-Za-z0-9_./-]{0,200}$")
 
 
 def _load_credentials() -> tuple[str, str]:
-    if not os.path.exists(CREDENTIALS):
-        with open(CREDENTIALS, "w", encoding="utf-8") as f:
-            json.dump({"utente": "demo", "password": secrets.token_urlsafe(12)}, f, indent=1)
+    if not CREDENTIALS.exists():
+        password = secrets.token_urlsafe(12)
+        fd = os.open(CREDENTIALS, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump({"utente": "admin", "password": password}, f, indent=1)
+        print(f"[auth] First start: sign in as 'admin' with password '{password}' (saved in {CREDENTIALS}).", flush=True)
     with open(CREDENTIALS, encoding="utf-8") as f:
         c = json.load(f)
     return c["utente"], c["password"]
@@ -92,7 +97,7 @@ def _safe_next(value: str | None) -> str:
 
 async def middleware(request: Request, call_next):
     path = request.url.path
-    if path in ("/login", "/logout") or authorized(request):
+    if settings.current().auth == "off" or path in ("/login", "/logout") or authorized(request):
         return await call_next(request)
     if request.method == "GET" and "text/html" in request.headers.get("accept", ""):
         nxt = _safe_next(path)

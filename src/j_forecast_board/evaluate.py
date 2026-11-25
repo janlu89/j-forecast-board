@@ -13,9 +13,10 @@ import numpy as np
 import pandas as pd
 
 from . import engine as E
-from .data import HOME, Dataset, known_extended
+from . import paths, settings
+from .data import Dataset, known_extended
 
-RESULTS_DIR = HOME / "results"
+RESULTS_DIR = paths.current().results_for(settings.current().model)
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 MEMO: dict[tuple, dict] = {}  # (ds_key, H, L, variant) -> result

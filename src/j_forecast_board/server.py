@@ -24,11 +24,12 @@ from . import data as D
 from . import engine as E
 from . import evaluate as V
 from . import planner as P
+from . import settings
 from .data import known_extended
 
 STATIC = os.path.join(os.path.dirname(__file__), "static")
 app = FastAPI(title="Timestral demo")
-DEFAULT_MODEL = "mistralai/Timestral-28M"
+DEFAULT_MODEL = settings.current().default_model_repo
 
 
 # ----------------------------------------------------------------------------- access protection
@@ -64,6 +65,8 @@ def default_variants(ds: D.Dataset) -> list[str]:
 def _startup():
     D.load_builtin()
     V.start_worker()
+    if not settings.current().background_eval:
+        return
     for ds in sorted(D.DATASETS.values(), key=lambda d: d.N):  # small datasets first
         for i, v in enumerate(default_variants(ds)):
             V.submit(ds, ds.horizon, ds.context, v, priority=1 if i == 0 else 2)
@@ -127,7 +130,8 @@ def models():
 @app.get("/api/system")
 def system():
     info = dict(os=f"{platform.system()} {platform.release()} ({platform.version()})", cpu=platform.processor(),
-                cores=os.cpu_count(), python=platform.python_version())
+                cores=os.cpu_count(), python=platform.python_version(), model_backend=settings.current().model,
+                offline=settings.current().offline)
     try:
         import torch
 
