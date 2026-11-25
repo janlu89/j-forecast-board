@@ -16,14 +16,15 @@ build/
 htmlcov/
 coverage.xml
 
-# Runtime data: never committed (downloaded datasets, caches, uploads, diagnostics)
-data/
-results/
-output/
-uploads/
-diagnostics/
+# Runtime data at the top of a checkout: never committed (datasets, caches, uploads, reports)
+/data/
+/results/
+/output/
+/uploads/
+/diagnostics/
 *.npz
-!tests/golden/fixtures/**/*.npz
+# The small public test fixtures are the exception
+!tests/golden/fixtures/**
 
 # Secrets and per-install settings of the original demo
 accesso_demo.json
