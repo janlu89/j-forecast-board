@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from pathlib import Path
 
 from . import settings
 
@@ -26,8 +27,19 @@ def serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def doctor(args: argparse.Namespace) -> int:
+    """Check this PC and write diagnostics/doctor-report.{json,txt}."""
+    from . import doctor as checkup
+
+    return checkup.run(args.mode, Path(args.out))
+
+
 def apply_command_line(args: argparse.Namespace) -> None:
     """Command line options win over JFB_* variables; offline mode also covers Hugging Face."""
+    if args.command == "doctor":
+        from . import doctor as checkup
+
+        checkup.prepare_environment(args.mode)
     if getattr(args, "host", None):
         os.environ["JFB_HOST"] = args.host
     if getattr(args, "port", None):
@@ -45,6 +57,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     serve_parser.add_argument("--port", type=int, help="port (default: JFB_PORT or 8000)")
     serve_parser.set_defaults(handler=serve)
+
+    doctor_parser = commands.add_parser("doctor", help="check this PC and write a report")
+    modes = doctor_parser.add_mutually_exclusive_group()
+    modes.add_argument(
+        "--no-model", dest="mode", action="store_const", const="no-model",
+        help="also start the app on the stub model and call every route",
+    )  # fmt: skip
+    modes.add_argument(
+        "--with-model", dest="mode", action="store_const", const="with-model",
+        help="like --no-model, plus one real Timestral forecast (may download the weights)",
+    )  # fmt: skip
+    doctor_parser.add_argument("--out", default="diagnostics", help="report folder")
+    doctor_parser.set_defaults(handler=doctor, mode="basic")
     return parser
 
 

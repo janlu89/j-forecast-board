@@ -9,7 +9,7 @@ description = "Local-first forecasting workbench powered by Mistral AI's Timestr
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Gianluca Meola" }]
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.12,<3.15"
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Operating System :: Microsoft :: Windows",
@@ -26,7 +26,8 @@ dependencies = [
   "numpy>=2.5",
   "holidays>=0.109",
   "torch>=2.15",
-  "timestral @ git+https://github.com/mistralai/timestral.git@v1.0.0",
+    # v1.0.0 as a zip archive: installing it needs no git
+  "timestral @ https://github.com/mistralai/timestral/archive/a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff.zip",
 ]
 
 [project.optional-dependencies]
@@ -51,7 +52,7 @@ j_forecast_board = ["static/**/*"]
 # ----------------------------------------------------------------------------- ruff
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 extend-exclude = ["src/j_forecast_board/static"]
 
 [tool.ruff.lint]
