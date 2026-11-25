@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 import queue
 import threading
 import time
 import traceback
+import zipfile
+import zlib
 from pathlib import Path
 
 import numpy as np
@@ -57,7 +60,8 @@ def eff_context(ds: Dataset, L: int | None) -> int:
 
 def _path(ds: Dataset, H: int, L: int, v: str) -> Path:
     repo, cov, zero = parse_variant(v)
-    name = f"H{H}_L{L}_{E.MODELS[repo]}_{'cov' if cov else 'nocov'}_{'zero' if zero else 'missing'}.npz"
+    model = repo.split("/")[-1]  # not the display label, which may carry "· stub"
+    name = f"H{H}_L{L}_{model}_{'cov' if cov else 'nocov'}_{'zero' if zero else 'missing'}.npz"
     return RESULTS_DIR / ds.key / name
 
 
@@ -67,16 +71,41 @@ def get_result(ds: Dataset, H: int, L: int, v: str) -> dict | None:
         return MEMO[k]
     p = _path(ds, H, L, v)
     if ds.persist and p.exists():
-        z = np.load(p, allow_pickle=False)
-        r = {name: z[name] for name in z.files}
-        r["meta"] = json.loads(str(r["meta"]))
+        r = _load(p)
+        if r is None:
+            return None
         if ds.N > 1 and r["meta"].get("total_v") != TOTAL_V:  # older file: refresh the cheap direct-total part
             _direct_total(ds, H, L, v, r)
             r["meta"]["total_v"] = TOTAL_V
-            np.savez_compressed(p, **{**{kk: vv for kk, vv in r.items() if kk != "meta"}, "meta": json.dumps(r["meta"])})
+            _save(p, {**{kk: vv for kk, vv in r.items() if kk != "meta"}, "meta": json.dumps(r["meta"])})
         MEMO[k] = r
         return r
     return None
+
+
+def _load(p: Path) -> dict | None:
+    """Read a cached result; a damaged file (e.g. cut by a crash) is deleted so it is computed again."""
+    try:
+        with np.load(p, allow_pickle=False) as z:
+            r = {name: z[name] for name in z.files}
+        r["meta"] = json.loads(str(r["meta"]))
+        return r
+    except (zipfile.BadZipFile, zlib.error, ValueError, KeyError, EOFError, OSError) as e:
+        print(f"[warn] cached result {p.name} is unreadable ({type(e).__name__}); it will be computed again.")
+        p.unlink(missing_ok=True)
+        return None
+
+
+def _save(p: Path, arrays: dict) -> None:
+    """Write atomically: stopping the app mid-write never leaves a truncated cache file."""
+    p.parent.mkdir(parents=True, exist_ok=True)
+    tmp = p.with_name(p.name + ".tmp")
+    try:
+        with open(tmp, "wb") as f:
+            np.savez_compressed(f, **arrays)
+        os.replace(tmp, p)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 TOTAL_V = 2  # version of the direct-total forecast (2 = with aggregated known covariates)
@@ -169,9 +198,7 @@ def _run(ds: Dataset, H: int, L: int, v: str, job: dict):
         _direct_total(ds, H, L, v, res)
     res["meta"] = json.dumps(dict(variant=v, H=H, L=L, N=ds.N, created=time.strftime("%Y-%m-%d %H:%M"), total_v=TOTAL_V))
     if ds.persist:
-        p = _path(ds, H, L, v)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        np.savez_compressed(p, **res)
+        _save(_path(ds, H, L, v), res)
     res["meta"] = json.loads(res["meta"])
     MEMO[(ds.key, H, L, v)] = res
 

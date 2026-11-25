@@ -105,9 +105,14 @@ elseif (-not (Test-SupportedPython -Command $venvPython)) {
     exit 1
 }
 
-Invoke-Step -Description 'Updating pip' -Command $venvPython -Arguments @('-m', 'pip', 'install', '--upgrade', 'pip')
-Invoke-Step -Description 'Installing the dependencies (about 1 GB the first time)' -Command $venvPython -Arguments @('-m', 'pip', 'install', '-r', 'requirements.txt')
-Invoke-Step -Description 'Installing J-Forecast Board' -Command $venvPython -Arguments @('-m', 'pip', 'install', '--no-deps', '--no-build-isolation', '--editable', '.')
+# pip also writes a detailed log, to read if an install step fails (e.g. behind a proxy)
+$diagnostics = Join-Path -Path $PSScriptRoot -ChildPath 'diagnostics'
+$null = New-Item -ItemType Directory -Path $diagnostics -Force
+$pipLog = Join-Path -Path $diagnostics -ChildPath 'pip.log'
+$pip = @('-m', 'pip', 'install', '--log', $pipLog)
+Invoke-Step -Description 'Updating pip' -Command $venvPython -Arguments ($pip + @('--upgrade', 'pip'))
+Invoke-Step -Description 'Installing the dependencies (about 1 GB the first time)' -Command $venvPython -Arguments ($pip + @('-r', 'requirements.txt'))
+Invoke-Step -Description 'Installing J-Forecast Board' -Command $venvPython -Arguments ($pip + @('--no-deps', '--no-build-isolation', '--editable', '.'))
 
 Write-Host ''
 Write-Host 'Checking the installation. The first time this also downloads the public datasets.'

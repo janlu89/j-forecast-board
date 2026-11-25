@@ -38,9 +38,12 @@ if [ ! -x .venv/bin/python ]; then
     fi
 fi
 
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m pip install --no-deps --no-build-isolation --editable .
+# pip also writes a detailed log, to read if an install step fails (e.g. behind a proxy)
+mkdir -p diagnostics
+PIP_LOG=diagnostics/pip.log
+.venv/bin/python -m pip install --log "$PIP_LOG" --upgrade pip
+.venv/bin/python -m pip install --log "$PIP_LOG" -r requirements.txt
+.venv/bin/python -m pip install --log "$PIP_LOG" --no-deps --no-build-isolation --editable .
 
 echo
 echo "Checking the installation. The first time this also downloads the public datasets."
