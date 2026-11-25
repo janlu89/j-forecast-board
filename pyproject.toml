@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "j-forecast-board"
 version = "0.1.0.dev0"
 description = "Local-first forecasting workbench powered by Mistral AI's Timestral models."
+readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Gianluca Meola" }]
@@ -29,6 +30,10 @@ dependencies = [
     # v1.0.0 as a zip archive: installing it needs no git
   "timestral @ https://github.com/mistralai/timestral/archive/a534bdbd244d64f3d9d743f46c7bf6fc330ed4ff.zip",
 ]
+
+[project.urls]
+Homepage = "https://github.com/janlu89/j-forecast-board"
+Issues = "https://github.com/janlu89/j-forecast-board/issues"
 
 [project.optional-dependencies]
 examples = ["matplotlib>=3.11"]
@@ -64,13 +69,13 @@ ignore = ["N818"]
 # Legacy demo layout, kept unchanged until Phase 2 moves each module into src/.
 # Remove an entry as soon as the module it covers is gone.
 "tools/**" = ["E501", "N", "SIM", "UP", "I"]
-"timestral_demo.py" = ["E501", "N", "SIM", "UP", "I"]
+"examples/quickstart_cli.py" = ["E501", "N", "SIM", "UP", "I"]
 
 [tool.ruff.format]
 # Same legacy exception: formatting these files is a refactor of its own (Phase 2).
 exclude = [
   "tools/**",
-  "timestral_demo.py",
+  "examples/quickstart_cli.py",
 ]
 
 # ----------------------------------------------------------------------------- pytest

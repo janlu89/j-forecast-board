@@ -9,6 +9,10 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 
 
+class PolicyError(ValueError):
+    """The policy file cannot be used as it is."""
+
+
 @dataclass(frozen=True)
 class Policy:
     allow_external_ai: bool = True
@@ -22,7 +26,7 @@ class Policy:
         known = {f.name for f in fields(cls)}
         unknown = sorted(set(data) - known)
         if unknown:
-            raise ValueError(f"Unknown policy keys: {', '.join(unknown)}")
+            raise PolicyError(f"Unknown policy keys: {', '.join(unknown)}")
         values = dict(data)
         hosts = values.get("allowed_ai_hosts")
         if hosts is not None:
@@ -34,7 +38,7 @@ class Policy:
             "offline",
         ):
             if name in values and not isinstance(values[name], bool):
-                raise ValueError(f"Policy key {name} must be true or false.")
+                raise PolicyError(f"Policy key {name} must be true or false.")
         return cls(**values)
 
     def allows_host(self, host: str) -> bool:

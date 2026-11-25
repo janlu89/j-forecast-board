@@ -82,7 +82,7 @@ def test_unknown_dataset_is_not_found(client):
 
 
 def test_upload_preview_of_the_sample_file(client, golden, repo_root):
-    sample = repo_root / "esempio_vendite_negozi.csv"
+    sample = repo_root / "examples" / "sample_store_sales.csv"
     with sample.open("rb") as handle:
         response = client.post("api/upload", files={"file": (sample.name, handle, "text/csv")})
     assert response.status_code == 200, response.text

@@ -122,7 +122,7 @@ def test_internal_tool_routes_need_an_open_answer(client):
 def test_the_toolbox_refuses_a_private_dataset_to_an_external_assistant(
     browser, container, repo_root
 ):
-    sample = repo_root / "esempio_vendite_negozi.csv"
+    sample = repo_root / "examples" / "sample_store_sales.csv"
     with sample.open("rb") as handle:
         uid = browser.post("api/upload", files={"file": (sample.name, handle, "text/csv")}).json()[
             "uid"

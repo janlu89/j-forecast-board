@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
 from ..adapters.inbound.http.auth import Authenticator
@@ -91,6 +92,8 @@ def build(settings: Settings, loaders: dict[str, Loader] | None = None) -> Conta
     paths.create()
     policy = load_policy(settings.policy_file or paths.config / "policy.json")
     offline = settings.offline or policy.offline  # the admin policy wins
+    if offline:
+        os.environ["HF_HUB_OFFLINE"] = "1"  # the Hugging Face library must not try either
     model: ForecastModel = StubModel() if settings.model == "stub" else TimestralModel(offline)
     catalog = InMemoryCatalog(Downloader(paths.data, offline), loaders)
     runner = ThreadJobRunner()
@@ -139,7 +142,9 @@ def build(settings: Settings, loaders: dict[str, Loader] | None = None) -> Conta
         workbench=workbench,
         credentials=credentials,
         authenticator=Authenticator(credentials, enabled=settings.auth == "on", audit=audit),
-        uploads=Uploads(CsvTableReader(), workbench, audit=audit),
+        uploads=Uploads(
+            CsvTableReader(), workbench, max_bytes=settings.max_upload_mb * 1024 * 1024, audit=audit
+        ),
         policy=policy,
         audit=audit,
         assistant=assistant,

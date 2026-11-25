@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Genera gli screenshot del manuale (src/j_forecast_board/static/manual/img) e la posizione dei numeri (shots.json).
 
 Uso (con il server attivo su http://127.0.0.1:8000):
@@ -5,6 +6,7 @@ Uso (con il server attivo su http://127.0.0.1:8000):
 """
 
 import json
+import os
 import random
 from datetime import date, timedelta
 from pathlib import Path
@@ -16,7 +18,7 @@ OUT = ROOT / "src" / "j_forecast_board" / "static" / "manual"
 IMG = OUT / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 URL = "http://127.0.0.1:8000/"
-SAMPLE = ROOT / "esempio_vendite_negozi.csv"
+SAMPLE = ROOT / "examples" / "sample_store_sales.csv"
 
 
 def make_sample_csv():
@@ -82,9 +84,11 @@ SHOTS = {}
 make_sample_csv()
 with sync_playwright() as p:
     b = p.chromium.launch(channel="msedge", headless=True)
-    cred = json.loads((ROOT / "accesso_demo.json").read_text(encoding="utf-8"))
-    page = b.new_page(viewport={"width": 1440, "height": 2600},
-                      http_credentials={"username": cred["utente"], "password": cred["password"]})
+    # Start the board with JFB_AUTH=off (and JFB_MODEL=stub for weight-free shots), or set
+    # JFB_SHOTS_PASSWORD to the admin password.
+    password = os.environ.get("JFB_SHOTS_PASSWORD")
+    login = {"http_credentials": {"username": "admin", "password": password}} if password else {}
+    page = b.new_page(viewport={"width": 1440, "height": 2600}, **login)
     page.goto(URL)
     page.wait_for_selector("#ovOut .kpis", timeout=240000)
     idle(page)

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Demo Timestral (Mistral AI) - wrapper minimale per forecasting su dati pubblici.
 

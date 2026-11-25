@@ -10,6 +10,7 @@ import secrets
 import sys
 from pathlib import Path
 
+from ..application.policy import PolicyError
 from . import settings
 
 
@@ -100,6 +101,27 @@ def agent(args: argparse.Namespace) -> int:
     except DomainError as error:
         print(error, file=sys.stderr)
         return 1
+    return 0
+
+
+def purge(args: argparse.Namespace) -> int:
+    """Delete every runtime file of this install: data, results, settings, keys, logs."""
+    import shutil
+
+    home = settings.current().home
+    if not home.exists():
+        print(f"Nothing to delete: {home} does not exist.")
+        return 0
+    if not args.yes:
+        answer = input(
+            f"Delete {home} and everything in it (sign-in, API keys, caches, logs)? [y/N] "
+        )
+        if answer.strip().lower() not in ("y", "yes"):
+            print("Nothing deleted.")
+            return 1
+    shutil.rmtree(home)
+    print(f"Deleted {home}.")
+    print("The model weights stay in the Hugging Face cache (see docs/data-protection.md).")
     return 0
 
 
@@ -205,6 +227,10 @@ def build_parser() -> argparse.ArgumentParser:
     clear_parser = actions.add_parser("clear", help="forget the settings and key of one assistant")
     clear_parser.add_argument("id")
     agent_parser.set_defaults(handler=agent)
+
+    purge_parser = commands.add_parser("purge", help="delete all runtime files of this install")
+    purge_parser.add_argument("--yes", action="store_true", help="do not ask for confirmation")
+    purge_parser.set_defaults(handler=purge)
     return parser
 
 
@@ -213,6 +239,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         apply_command_line(args)
         return args.handler(args)
-    except settings.SettingsError as error:
+    except (settings.SettingsError, PolicyError) as error:
         print(f"Configuration error: {error}", file=sys.stderr)
         return 2

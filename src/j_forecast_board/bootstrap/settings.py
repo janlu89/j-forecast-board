@@ -43,6 +43,7 @@ class Settings:
     chat_timeout: int = 240
     log_level: str = "info"
     policy_file: Path | None = None  # default: config/policy.json under home
+    max_upload_mb: int = 200
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> Settings:
@@ -61,6 +62,7 @@ class Settings:
             chat_timeout=reader.integer("JFB_CHAT_TIMEOUT", 240, minimum=1, maximum=3600),
             log_level=reader.choice("JFB_LOG_LEVEL", "info", LOG_LEVELS),
             policy_file=Path(env["JFB_POLICY_FILE"]) if env.get("JFB_POLICY_FILE") else None,
+            max_upload_mb=reader.integer("JFB_MAX_UPLOAD_MB", 200, minimum=1, maximum=2000),
         )
         settings.check_exposure()
         return settings

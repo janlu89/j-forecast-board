@@ -105,3 +105,34 @@ def test_default_home_on_linux_follows_xdg(tmp_path):
     assert default_home({}, system="Linux", user_home=tmp_path) == (
         tmp_path / ".local" / "share" / "j-forecast-board"
     )
+
+
+def test_upload_limit_is_configurable(tmp_path):
+    assert Settings.from_env({"JFB_HOME": str(tmp_path)}).max_upload_mb == 200
+    assert (
+        Settings.from_env({"JFB_HOME": str(tmp_path), "JFB_MAX_UPLOAD_MB": "20"}).max_upload_mb
+        == 20
+    )
+    with pytest.raises(SettingsError, match="JFB_MAX_UPLOAD_MB"):
+        Settings.from_env({"JFB_HOME": str(tmp_path), "JFB_MAX_UPLOAD_MB": "0"})
+
+
+def test_purge_deletes_the_runtime_folder(tmp_path, monkeypatch):
+    from j_forecast_board.bootstrap import cli, settings
+
+    home = tmp_path / "home"
+    (home / "secrets").mkdir(parents=True)
+    (home / "secrets" / "agent-keys.json").write_text("{}")
+    monkeypatch.setattr(settings, "current", lambda: Settings(home=home))
+    assert cli.main(["purge", "--yes"]) == 0
+    assert not home.exists()
+
+
+def test_a_broken_policy_file_stops_the_start(tmp_path, monkeypatch, capsys):
+    from j_forecast_board.bootstrap import cli, settings
+
+    policy = tmp_path / "policy.json"
+    policy.write_text('{"allow_external_ai": "no"}', encoding="utf-8")
+    monkeypatch.setattr(settings, "current", lambda: Settings(home=tmp_path, policy_file=policy))
+    assert cli.main(["agent", "list"]) == 2
+    assert "allow_external_ai must be true or false" in capsys.readouterr().err

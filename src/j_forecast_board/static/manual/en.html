@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Practical guide · Timestral demo</title>
+<title>Practical guide · J-Forecast Board</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ff7a1a'/%3E%3Cpath d='M3 4h10M3 8h10M3 12h6' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <style>
   :root { --o: #ff7a1a; --g: #16a34a; --gl: #34d399; --ink: #1f2430; --mut: #5d6475; --bg: #f6f5f2; --card: #fff; --line: #e6e3dc; }
@@ -111,6 +111,7 @@
     <a href="#data"><span>📤</span> Your data</a>
     <a href="#paths"><span>🗺️</span> Guided paths</a>
     <a href="#words"><span>📖</span> Difficult words</a>
+    <a href="#assistant"><span>💬</span> The AI assistant</a>
     <a href="#problems"><span>🛟</span> If something goes wrong</a>
   </div>
 </section>
@@ -119,16 +120,15 @@
 <section id="open">
   <h2><span class="ico">🔗</span> How to open it</h2>
   <div class="flow">
-    <div class="st"><div class="big">💻</div><b>1. The demo PC is on</b>and the program is running (file <span class="en">avvia_ui.ps1</span>)</div>
+    <div class="st"><div class="big">💻</div><b>1. Start the board</b>on this PC: double-click <span class="en">start.cmd</span> (Windows) or run <span class="en">./start.sh</span> (Linux)</div>
     <div class="ar">→</div>
-    <div class="st"><div class="big">🌐</div><b>2. Open the link</b>from any computer or phone, in a browser (Chrome, Edge, Safari…)</div>
+    <div class="st"><div class="big">🌐</div><b>2. Open the address</b>below in a browser (Chrome, Edge, Firefox…)</div>
     <div class="ar">→</div>
-    <div class="st"><div class="big">🔐</div><b>3. Enter username and password</b>in the small window that appears (ask whoever runs the demo)</div>
+    <div class="st"><div class="big">🔐</div><b>3. Sign in</b>as <span class="en">admin</span> with the password shown at the first start</div>
   </div>
-  <p style="font-size:18px">Address: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a><br>
-    On the demo PC itself this also works: <a href="http://localhost:8000/">http://localhost:8000/</a></p>
-  <div class="tip"><b>💡</b> Nothing to install: a browser is enough. The site is password-protected and the data you upload stays on the demo PC.
-    The browser remembers the password until you close it.</div>
+  <p style="font-size:18px">Address: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a></p>
+  <div class="tip"><b>💡</b> Nothing to install: a browser is enough. The board is password-protected and the data you upload stays on this PC.
+    The browser stays signed in for 30 days.</div>
 </section>
 
 <!-- ================================================================ COLOURS -->
@@ -347,7 +347,7 @@
 <!-- ================================================================ DATA -->
 <section id="data" class="page">
   <h2><span class="ico">📤</span> Your data – trying it with our own numbers</h2>
-  <div class="purpose">Upload a file exported from Excel and the model analyses it just like the examples. <b>The file never leaves the demo PC.</b></div>
+  <div class="purpose">Upload a file exported from Excel and the model analyses it just like the examples. <b>The file never leaves this PC.</b></div>
   <h3>How to prepare the file (in Excel)</h3>
   <div class="flow">
     <div class="st"><div class="big">📅</div><b>One column with the date</b>e.g. 01/03/2024</div>
@@ -356,7 +356,7 @@
     <div class="st"><div class="big">➕</div><b>(Optional) extra information</b>promo yes/no, open yes/no, price…</div>
     <div class="st"><div class="big">💾</div><b>Save as CSV</b>File → Save As → “CSV (Comma delimited)”</div>
   </div>
-  <div class="tip"><b>💡</b> To try it right away there is a <b>made-up</b> sample file in the project folder: <span class="en">esempio_vendite_negozi.csv</span> (3 stores, 2 years, with promotions).
+  <div class="tip"><b>💡</b> To try it right away there is a <b>made-up</b> sample file in the project folder: <span class="en">examples/sample_store_sales.csv</span> (3 stores, 2 years, with promotions).
     If you want the model to know about future promotions, add rows for the future days at the end with the promo filled in and the sales column <b>empty</b> (the sample already does this for 30 days).</div>
   <figure class="shot" data-shot="dati"><img src="img/dati.png" alt="Your data"></figure>
   <ol class="legend">
@@ -449,11 +449,27 @@
 </section>
 
 <!-- ================================================================ PROBLEMS -->
+<section id="assistant" class="page">
+  <h2><span class="ico">💬</span> The AI assistant (optional)</h2>
+  <div class="purpose">Ask questions in plain English about the page you are looking at. The assistant explains the numbers and can run the
+    board's forecasting tools. <b>It is off until you set it up</b>, and the rest of the board works without it.</div>
+  <div class="flow">
+    <div class="st"><div class="big">⚙</div><b>1. Open the setup</b>with the <span class="en">Set up the AI assistant</span> button, bottom right</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔌</div><b>2. Choose and test</b>a model on this PC, an online service (Groq, OpenRouter, Mistral, OpenAI) or the Claude Code CLI, then <span class="en">Save and test</span></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">✅</div><b>3. Use it</b>with <span class="en">Use this assistant</span></div>
+  </div>
+  <div class="warn"><b>⚠️</b> An <b>External</b> assistant sends your question and what the page shows to that online service. The board asks you to
+    confirm it first and then shows an amber <span class="en">External</span> badge in the chat. A <b>Local</b> one (green badge) keeps everything on
+    this PC. Your own uploaded data is never sent to an external assistant. Check your company's rules before using company data.</div>
+</section>
+
 <section id="problems" class="page">
   <h2><span class="ico">🛟</span> If something goes wrong</h2>
   <table class="gl">
-    <tr><td>The page doesn’t open</td><td>Is the demo PC on and the program running? On the demo PC, run <span class="en">avvia_ui.ps1</span>.</td></tr>
-    <tr><td>It asks for a username and password</td><td>That is normal: the site is protected. If the password is rejected, ask again whoever runs the demo (it is in the file <span class="en">accesso_demo.json</span> on the demo PC).</td></tr>
+    <tr><td>The page doesn’t open</td><td>Is the board running? Start it with <span class="en">start.cmd</span> (Windows) or <span class="en">./start.sh</span> (Linux) and keep its window open.</td></tr>
+    <tr><td>It asks for a username and password</td><td>That is normal: the site is protected. The first password is shown when the board starts for the first time. Forgot it? Set a new one with <span class="en">python -m j_forecast_board password</span> (see the README).</td></tr>
     <tr><td>“Timestral is evaluating…”</td><td>It is the first calculation for that data: wait, the yellow pill at the top shows the minutes left. Afterwards it is saved and the next time is instant.</td></tr>
     <tr><td>A button does nothing</td><td>Check whether a red box with an error message appears at the bottom right; it often says what to fix (e.g. “too many steps”).</td></tr>
     <tr><td>The 209M model is very slow</td><td>That is normal on this PC without a graphics card: for 1,115 stores it takes about 20–25 minutes. For tests, use 28M.</td></tr>

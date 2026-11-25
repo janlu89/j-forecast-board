@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-from ....application.policy import Policy
+from ....application.policy import Policy, PolicyError
 
 
 class JsonSettingsStore:
@@ -35,7 +35,7 @@ def load_policy(path: Path) -> Policy:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except ValueError as error:
-        raise ValueError(f"The policy file {path} is not valid JSON: {error}") from None
+        raise PolicyError(f"The policy file {path} is not valid JSON: {error}") from None
     if not isinstance(data, dict):
-        raise ValueError(f"The policy file {path} must contain a JSON object.")
+        raise PolicyError(f"The policy file {path} must contain a JSON object.")
     return Policy.from_dict(data)

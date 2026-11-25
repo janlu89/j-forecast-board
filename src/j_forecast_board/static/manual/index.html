@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guida pratica · Demo Timestral</title>
+<title>Guida pratica · J-Forecast Board</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ff7a1a'/%3E%3Cpath d='M3 4h10M3 8h10M3 12h6' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <style>
   :root { --o: #ff7a1a; --g: #16a34a; --gl: #34d399; --ink: #1f2430; --mut: #5d6475; --bg: #f6f5f2; --card: #fff; --line: #e6e3dc; }
@@ -122,6 +122,7 @@
     <a href="#dati"><span>📤</span> Your data</a>
     <a href="#percorsi"><span>🗺️</span> Percorsi guidati</a>
     <a href="#parole"><span>📖</span> Parole difficili</a>
+    <a href="#assistente"><span>💬</span> L’assistente AI</a>
     <a href="#problemi"><span>🛟</span> Se qualcosa non va</a>
   </div>
 </section>
@@ -130,16 +131,15 @@
 <section id="apri">
   <h2><span class="ico">🔗</span> Come si apre</h2>
   <div class="flow">
-    <div class="st"><div class="big">💻</div><b>1. Il PC della demo è acceso</b>e il programma è avviato (file <span class="en">avvia_ui.ps1</span>)</div>
+    <div class="st"><div class="big">💻</div><b>1. Avvia la board</b>su questo PC: doppio clic su <span class="en">start.cmd</span> (Windows) oppure <span class="en">./start.sh</span> (Linux)</div>
     <div class="ar">→</div>
-    <div class="st"><div class="big">🌐</div><b>2. Apri il link</b>da qualsiasi computer o telefono, nel browser (Chrome, Edge, Safari…)</div>
+    <div class="st"><div class="big">🌐</div><b>2. Apri l'indirizzo</b>qui sotto nel browser (Chrome, Edge, Firefox…)</div>
     <div class="ar">→</div>
-    <div class="st"><div class="big">🔐</div><b>3. Inserisci utente e password</b>nella finestrella che compare (chiedili a chi gestisce la demo)</div>
+    <div class="st"><div class="big">🔐</div><b>3. Accedi</b>come <span class="en">admin</span> con la password mostrata al primo avvio</div>
   </div>
-  <p style="font-size:18px">Indirizzo: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a><br>
-    Sul PC stesso funziona anche: <a href="http://localhost:8000/">http://localhost:8000/</a></p>
-  <div class="tip"><b>💡</b> Non serve installare niente: basta il browser. Il sito è protetto da password e i dati che carichi restano sul PC della demo.
-    Il browser ricorda la password finché non lo chiudi.</div>
+  <p style="font-size:18px">Indirizzo: <a href="http://localhost:8000/"><b>http://localhost:8000/</b></a></p>
+  <div class="tip"><b>💡</b> Non serve installare niente: basta il browser. La board è protetta da password e i dati che carichi restano su questo PC.
+    Il browser resta collegato per 30 giorni.</div>
   <div class="warn"><b>⚠️</b> Le scritte dell’applicazione sono in inglese. In questa guida trovi sempre il nome inglese del bottone <span class="en">così</span> e accanto cosa significa.</div>
 </section>
 
@@ -359,7 +359,7 @@
 <!-- ================================================================ DATI -->
 <section id="dati" class="page">
   <h2><span class="ico">📤</span> Your data – provare con i nostri numeri</h2>
-  <div class="purpose">Carichi un file esportato da Excel e il modello lo analizza come gli esempi. <b>Il file non esce dal PC della demo.</b></div>
+  <div class="purpose">Carichi un file esportato da Excel e il modello lo analizza come gli esempi. <b>Il file non esce da questo PC.</b></div>
   <h3>Come preparare il file (in Excel)</h3>
   <div class="flow">
     <div class="st"><div class="big">📅</div><b>Una colonna con la data</b>es. 01/03/2024</div>
@@ -368,7 +368,7 @@
     <div class="st"><div class="big">➕</div><b>(Facoltative) informazioni in più</b>promo sì/no, aperto sì/no, prezzo…</div>
     <div class="st"><div class="big">💾</div><b>Salva come CSV</b>File → Salva con nome → “CSV (delimitato dal separatore di elenco)”</div>
   </div>
-  <div class="tip"><b>💡</b> Per provare subito c’è un file di esempio <b>inventato</b> nella cartella del progetto: <span class="en">esempio_vendite_negozi.csv</span> (3 negozi, 2 anni, con promozioni).
+  <div class="tip"><b>💡</b> Per provare subito c’è un file di esempio <b>inventato</b> nella cartella del progetto: <span class="en">examples/sample_store_sales.csv</span> (3 negozi, 2 anni, con promozioni).
     Se vuoi che il modello sappia le promo future, aggiungi in fondo le righe dei giorni futuri con la promo compilata e la colonna vendite <b>vuota</b> (l’esempio lo fa già per 30 giorni).</div>
   <figure class="shot" data-shot="dati"><img src="img/dati.png" alt="Your data"></figure>
   <ol class="legend">
@@ -461,11 +461,27 @@
 </section>
 
 <!-- ================================================================ PROBLEMI -->
+<section id="assistente" class="page">
+  <h2><span class="ico">💬</span> L’assistente AI (facoltativo)</h2>
+  <div class="purpose">Fai domande in inglese sulla pagina che stai guardando: l’assistente spiega i numeri e può usare gli strumenti di
+    previsione della board. <b>È spento finché non lo configuri</b>, e il resto della board funziona anche senza.</div>
+  <div class="flow">
+    <div class="st"><div class="big">⚙</div><b>1. Apri la configurazione</b>con il bottone <span class="en">Set up the AI assistant</span> in basso a destra</div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">🔌</div><b>2. Scegli e prova</b>un modello su questo PC, un servizio online (Groq, OpenRouter, Mistral, OpenAI) o la Claude Code CLI, poi <span class="en">Save and test</span></div>
+    <div class="ar">→</div>
+    <div class="st"><div class="big">✅</div><b>3. Usalo</b>con <span class="en">Use this assistant</span></div>
+  </div>
+  <div class="warn"><b>⚠️</b> Un assistente <b>External</b> manda la tua domanda e quello che mostra la pagina a quel servizio online. La board ti chiede
+    prima di confermarlo e poi mostra nella chat un’etichetta arancione <span class="en">External</span>. Uno <b>Local</b> (etichetta verde) tiene tutto
+    su questo PC. I dati che carichi tu non vengono mai mandati a un assistente esterno. Controlla le regole della tua azienda prima di usare dati aziendali.</div>
+</section>
+
 <section id="problemi" class="page">
   <h2><span class="ico">🛟</span> Se qualcosa non va</h2>
   <table class="gl">
-    <tr><td>La pagina non si apre</td><td>Il PC della demo è acceso e il programma è avviato? Sul PC della demo avvia <span class="en">avvia_ui.ps1</span>.</td></tr>
-    <tr><td>Chiede utente e password</td><td>È normale: il sito è protetto. Se la password non viene accettata, chiedila di nuovo a chi gestisce la demo (è nel file <span class="en">accesso_demo.json</span> sul PC della demo).</td></tr>
+    <tr><td>La pagina non si apre</td><td>La board è avviata? Avviala con <span class="en">start.cmd</span> (Windows) o <span class="en">./start.sh</span> (Linux) e lascia aperta la sua finestra.</td></tr>
+    <tr><td>Chiede utente e password</td><td>È normale: il sito è protetto. La prima password compare al primo avvio della board. Dimenticata? Impostane una nuova con <span class="en">python -m j_forecast_board password</span> (vedi il README).</td></tr>
     <tr><td>“Timestral is evaluating…”</td><td>È il primo calcolo per quei dati: aspetta, la pillola gialla in alto mostra i minuti mancanti. Poi resta salvato e la volta dopo è istantaneo.</td></tr>
     <tr><td>Un bottone non fa nulla</td><td>Guarda se compare un riquadro rosso in basso a destra con il messaggio d’errore; spesso indica cosa correggere (es. “too many steps”).</td></tr>
     <tr><td>Il modello 209M è lentissimo</td><td>È normale su questo PC senza scheda grafica: per 1.115 negozi servono circa 20–25 minuti. Per le prove usa il 28M.</td></tr>
