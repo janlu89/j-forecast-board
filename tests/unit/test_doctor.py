@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import ssl
 from pathlib import Path
 
@@ -22,6 +23,8 @@ from j_forecast_board.bootstrap.doctor.report import (
 )
 
 HOME = Path("/home/alice")
+HOME_TEXT = str(HOME)  # "\\home\\alice" on Windows
+SEP = os.sep
 
 
 def report(*checks: Check) -> Report:
@@ -30,11 +33,8 @@ def report(*checks: Check) -> Report:
 
 def test_redactor_hides_the_home_folder_and_user_name():
     redactor = Redactor(home=HOME, user="alice")
-    value = {"path": "/home/alice/.local/share/x", "items": ["user alice", ("/home/alice",)]}
-    assert redactor.value(value) == {
-        "path": "~/.local/share/x",
-        "items": ["user <user>", ["~"]],
-    }
+    value = {"path": f"{HOME_TEXT}{SEP}.local", "items": ["user alice", (HOME_TEXT,)]}
+    assert redactor.value(value) == {"path": f"~{SEP}.local", "items": ["user <user>", ["~"]]}
 
 
 def test_short_user_names_are_not_replaced_inside_words():
@@ -49,7 +49,7 @@ def test_report_counts_and_exit_code():
 
 
 def test_report_json_has_the_documented_fields(tmp_path):
-    json_path, text_path = report(Check("a", "system", OK, "at /home/alice")).write(
+    json_path, text_path = report(Check("a", "system", OK, f"at {HOME_TEXT}")).write(
         tmp_path, Redactor(home=HOME, user="alice")
     )
     data = json.loads(json_path.read_text(encoding="utf-8"))

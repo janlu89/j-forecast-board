@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import shutil
@@ -37,7 +38,9 @@ class NpzResultStore:
         if not ds.persist or not path.exists():
             return None
         try:
-            with np.load(path, allow_pickle=False) as stored:
+            # Read the bytes first: a file numpy cannot parse stays open otherwise, and Windows
+            # refuses to delete an open file.
+            with np.load(io.BytesIO(path.read_bytes()), allow_pickle=False) as stored:
                 arrays = {name: stored[name] for name in stored.files}
             return _result(arrays)
         except (zipfile.BadZipFile, zlib.error, ValueError, KeyError, EOFError, OSError) as error:
