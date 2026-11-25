@@ -131,9 +131,14 @@ def _route_checks(app: LocalApp, paths: RuntimePaths, progress) -> list[Check]:
         run_check("app", "GET /api/datasets", lambda: _datasets(app)),
         _route(app, "GET /api/models", "GET", "/api/models", expect=200),
         _route(app, "GET /api/system", "GET", "/api/system", expect=200),
-        _route(app, "GET /api/agents", "GET", "/api/agents", expect=200),
+        _route(app, "GET /api/assistant", "GET", "/api/assistant", expect=200),
         _route(
-            app, "POST /api/agents/test", "POST", "/api/agents/test", 200, body={"id": "claude"}
+            app,
+            "POST /api/chat (off until set up)",
+            "POST",
+            "/api/chat",
+            409,
+            body={"message": "hi"},
         ),
     ]
     uploaded = _upload(app, checks)
